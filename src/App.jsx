@@ -1,20 +1,13 @@
-import './App.css'
-import MenuBar from './components/MenuBar'
-
+import './App.css';
+import MenuBar from './components/MenuBar.jsx';
+import Inicio from './components/inicio.jsx';
 
 function App() {
-
-
   return (
-    <div className="App">
-      <MenuBar/>
-      <h1 class="letra">
-        ola ke aces
-      </h1>
-      </div>
-
-  )
-
+    <>
+      <Inicio />
+    </>
+  );
 }
 
-export default App
+export default App;

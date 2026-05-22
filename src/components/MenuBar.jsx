@@ -96,18 +96,11 @@ const menuItems = [
 const MenuBar = () => {
   return (
     <header className="navbar">
-      <div className="top-links">
-        <span>Help</span>
-        <span>|</span>
-        <span>Join Us</span>
-        <span>|</span>
-        <span>Sign In</span>
-      </div>
 
       <div className="nav-content">
         <div className="logo">
           <span className="logo-icon">◢</span>
-          <span>TiendaTec</span>
+          <span>Jenna Moda</span>
         </div>
 
         <nav className="nav-menu">
@@ -161,5 +154,7 @@ const MenuBar = () => {
     </header>
   );
 };
+
+
 
 export default MenuBar;
