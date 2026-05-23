@@ -1,11 +1,15 @@
 import './App.css';
-import MenuBar from './components/MenuBar.jsx';
+import Formulario from './components/Formulario.jsx';
+
 import Inicio from './components/inicio.jsx';
+import PieDePagina from './components/PieDePagina.jsx';
 
 function App() {
   return (
     <>
       <Inicio />
+      <Formulario/>
+      <PieDePagina/>
     </>
   );
 }
