@@ -1,0 +1,538 @@
+ 
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap');
+ 
+/* ── RESET BÁSICO ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+/* ── ROOT ── */
+.db-root {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: #0d0d0d;
+  font-family: 'DM Mono', monospace;
+  color: #c2c0b6;
+  overflow-x: hidden;
+}
+ 
+/* ================================================
+   SIDEBAR
+   ================================================ */
+.db-sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: #111;
+  border-right: 1px solid #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 0;
+  flex-shrink: 0;
+}
+ 
+.db-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px 32px;
+  border-bottom: 1px solid #1e1e1e;
+}
+ 
+.db-brand-mark {
+  font-size: 18px;
+  color: #fff;
+}
+ 
+.db-brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+ 
+/* Navegación */
+.db-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 24px 12px;
+  flex: 1;
+}
+ 
+.db-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  color: #555;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  text-align: left;
+}
+ 
+.db-nav-item:hover {
+  color: #aaa;
+  background: #1a1a1a;
+}
+ 
+.db-nav-item.active {
+  color: #fff;
+  background: #1e1e1e;
+}
+ 
+.db-nav-icon {
+  font-size: 14px;
+  opacity: 0.7;
+}
+ 
+/* Footer sidebar */
+.db-sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px 0;
+  border-top: 1px solid #1e1e1e;
+}
+ 
+.db-avatar {
+  width: 32px;
+  height: 32px;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #888;
+  flex-shrink: 0;
+}
+ 
+.db-avatar-name {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 2px;
+}
+ 
+.db-avatar-role {
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+ 
+/* ================================================
+   CONTENIDO PRINCIPAL
+   ================================================ */
+.db-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+ 
+/* Header */
+.db-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 40px 24px;
+  border-bottom: 1px solid #1a1a1a;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+ 
+.db-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 300;
+  color: #fff;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+ 
+.db-subtitle {
+  font-size: 11px;
+  color: #444;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+ 
+/* Buscador */
+.db-search {
+  background: #1a1a1a;
+  border: 1px solid #242424;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+  color: #ccc;
+  outline: none;
+  width: 280px;
+  max-width: 100%;
+  transition: border-color 0.2s;
+}
+ 
+.db-search:focus {
+  border-color: #444;
+}
+ 
+.db-search::placeholder {
+  color: #333;
+}
+ 
+/* ================================================
+   ESTADÍSTICAS
+   ================================================ */
+.db-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid #1a1a1a;
+}
+ 
+.db-stat {
+  padding: 24px 40px;
+  border-right: 1px solid #1a1a1a;
+}
+ 
+.db-stat:last-child {
+  border-right: none;
+}
+ 
+.db-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+ 
+.db-stat-label {
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+ 
+/* ================================================
+   TABLA
+   ================================================ */
+.db-table-wrap {
+  flex: 1;
+  overflow: auto;
+  padding: 0 40px 40px;
+}
+ 
+.db-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+}
+ 
+.db-table thead tr {
+  border-bottom: 1px solid #1e1e1e;
+}
+ 
+.db-table th {
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3a3a3a;
+  font-weight: 400;
+  white-space: nowrap;
+}
+ 
+.db-table td {
+  padding: 16px 16px;
+  border-bottom: 1px solid #141414;
+  font-size: 12px;
+  color: #888;
+  vertical-align: middle;
+  transition: color 0.15s;
+}
+ 
+.db-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+ 
+.db-table tbody tr:hover td {
+  background: #161616;
+  color: #bbb;
+}
+ 
+.db-table tbody tr.selected td {
+  background: #1a1a1a;
+  color: #ccc;
+}
+ 
+/* Celdas específicas */
+.db-id {
+  font-size: 11px;
+  color: #333 !important;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+ 
+.db-nombre {
+  color: #bbb !important;
+  font-size: 13px;
+  white-space: nowrap;
+}
+ 
+.db-email {
+  font-size: 11px !important;
+  color: #555 !important;
+}
+ 
+.db-mensaje {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #444 !important;
+  font-size: 11px !important;
+}
+ 
+.db-fecha {
+  font-size: 10px !important;
+  color: #333 !important;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+}
+ 
+/* Badge de motivo */
+.db-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid;
+  white-space: nowrap;
+}
+ 
+/* Botón ver */
+.db-ver {
+  background: none;
+  border: 1px solid #222;
+  color: #444;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+ 
+.db-ver:hover {
+  border-color: #555;
+  color: #aaa;
+}
+ 
+/* Estado vacío */
+.db-empty {
+  text-align: center;
+  padding: 80px 0;
+  color: #2a2a2a;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+ 
+/* ================================================
+   PANEL DE DETALLE
+   ================================================ */
+.db-detail {
+  width: 300px;
+  min-height: 100vh;
+  background: #111;
+  border-left: 1px solid #1e1e1e;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex-shrink: 0;
+  animation: slideIn 0.2s ease;
+}
+ 
+@keyframes slideIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+ 
+.db-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+ 
+.db-detail-title {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #444;
+}
+ 
+.db-detail-close {
+  background: none;
+  border: none;
+  color: #444;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+}
+ 
+.db-detail-close:hover {
+  color: #aaa;
+}
+ 
+.db-detail-id {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: #fff;
+  border-bottom: 1px solid #1e1e1e;
+  padding-bottom: 16px;
+}
+ 
+.db-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+ 
+.db-detail-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #333;
+}
+ 
+.db-detail-value {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 1.6;
+  word-break: break-word;
+}
+ 
+.db-detail-msg .db-detail-value {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.7;
+  margin-top: 4px;
+}
+ 
+/* Botón responder */
+.db-reply-btn {
+  margin-top: auto;
+  padding: 12px;
+  background: #fff;
+  color: #111;
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+ 
+.db-reply-btn:hover {
+  background: #e0e0e0;
+}
+ 
+/* ================================================
+   RESPONSIVE
+   ================================================ */
+@media (max-width: 1100px) {
+  .db-detail {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 20;
+    box-shadow: -24px 0 50px rgba(0, 0, 0, 0.35);
+  }
+}
+ 
+@media (max-width: 768px) {
+  .db-root {
+    display: block;
+  }
+
+  .db-sidebar {
+    display: none;
+  }
+
+  .db-main {
+    min-height: 100vh;
+  }
+
+  .db-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .db-stat {
+    padding: 20px;
+  }
+
+  .db-header {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 24px 20px;
+  }
+
+  .db-table-wrap {
+    padding: 0 20px 20px;
+  }
+
+  .db-search {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .db-header {
+    padding: 22px 16px;
+  }
+
+  .db-title {
+    font-size: 24px;
+  }
+
+  .db-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .db-stat {
+    border-right: none;
+    border-bottom: 1px solid #1a1a1a;
+  }
+
+  .db-table-wrap {
+    padding: 0 12px 18px;
+  }
+
+  .db-table th,
+  .db-table td {
+    padding: 12px 10px;
+  }
+
+  .db-detail {
+    width: 100%;
+    min-height: 100svh;
+    padding: 28px 22px;
+  }
+}
