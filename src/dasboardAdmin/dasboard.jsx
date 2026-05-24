@@ -45,7 +45,7 @@ const MOTIVO_COLOR = {
   mayorista: { label: "Mayorista", color: "#c49a00" },
   otro:      { label: "Otro",      color: "#555" },
 };
- 
+ //ooal
 const Dashboard = () => {
   const [filtro, setFiltro]         = useState('');
   const [seleccionada, setSeleccionada] = useState(null);
