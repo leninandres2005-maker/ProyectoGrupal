@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import MenuBar from './MenuBar.jsx';
+import ListaProductos from './card_ropa.jsx';
 import './inicio.css';
 
 function Inicio() {
   const [imagenPortada, setImagenPortada] = useState('');
+  const [categoria, setCategoria] = useState('minimalist-clothing');
 
   useEffect(() => {
 
@@ -24,7 +26,7 @@ function Inicio() {
   return (
     <div className="App">
 
-      <MenuBar />
+      <MenuBar setCategoria={setCategoria} />
 
       <div
         className="hero-section"
@@ -34,6 +36,8 @@ function Inicio() {
           <button className="btn-comprar">Comprar ahora</button>
         </div>
       </div>
+
+      <ListaProductos categoria={categoria} />
     </div>
   );
 }

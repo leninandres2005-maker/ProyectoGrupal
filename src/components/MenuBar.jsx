@@ -1,99 +1,165 @@
 const menuItems = [
   {
-    name: "Hombres",
+    name: "Hombre", 
+    query: "men-clothing",
     columns: [
       {
         title: "Casual",
-        items: ["Camisas", "pantalon", "gorras"],
+        items: [
+          { name: "Camisas", query: "men-casual-shirt" },
+          { name: "pantalon", query: "men-casual-pants" },
+          { name: "gorras", query: "men-casual-cap" }
+        ],
       },
       {
         title: "Deporte",
         active: true,
-        items: ["Basketball", "Futbol", "Running"],
+        items: [
+          { name: "Basketball", query: "men-basketball-clothing" },
+          { name: "Futbol", query: "men-soccer-clothing" },
+          { name: "Running", query: "men-running-clothing" }
+        ],
       },
       {
         title: "Formal",
-        items: ["Ternos", "Pantalon ", "Conjuntos"],
+        items: [
+          { name: "Ternos", query: "men-suits" },
+          { name: "Pantalon ", query: "men-formal-pants" },
+          { name: "Conjuntos", query: "men-formal-wear" }
+        ],
       },
     ],
     products: ["Basketball", "Football", "Running"],
   },
   {
     name: "Mujeres",
+    query: "women-clothing",
     columns: [
       {
         title: "Tendencias",
-        items: ["Blusas", "tops", "shorts", "moda"],
+        items: [
+          { name: "Blusas", query: "women-blouse" },
+          { name: "tops", query: "women-top" },
+          { name: "shorts", query: "women-shorts" },
+          { name: "moda", query: "women-fashion" }
+        ],
       },
       {
         title: "Casual",
         active: true,
-        items: ["Vestidos", "Calzado", "Casual"],
+        items: [
+          { name: "Vestidos", query: "women-casual-dress" },
+          { name: "Calzado", query: "women-shoes" },
+          { name: "Casual", query: "women-casual-clothing" }
+        ],
       },
-     
     ],
     products: ["Running", "Training", "Casual"]
   },
   {
     name: "Kids",
+    query: "kids-clothing",
     columns: [
       {
         title: "Featured",
-        items: ["New Kids", "School Shoes", "Sports", "Offers"],
+        items: [
+          { name: "New Kids", query: "kids-new-clothing" },
+          { name: "School Shoes", query: "kids-school-shoes" },
+          { name: "Sports", query: "kids-sportswear" },
+          { name: "Offers", query: "kids-clothes-sale" }
+        ],
       },
       {
         title: "Shoes",
         active: true,
-        items: ["Boys Shoes", "Girls Shoes", "Running", "All Kids Shoes"],
+        items: [
+          { name: "Boys Shoes", query: "boys-shoes" },
+          { name: "Girls Shoes", query: "girls-shoes" },
+          { name: "Running", query: "kids-running-shoes" },
+          { name: "All Kids Shoes", query: "kids-shoes" }
+        ],
       },
       {
         title: "Clothing",
-        items: ["T-Shirts", "Shorts", "Hoodies", "Tracksuits"],
+        items: [
+          { name: "T-Shirts", query: "kids-tshirt" },
+          { name: "Shorts", query: "kids-shorts" },
+          { name: "Hoodies", query: "kids-hoodie" },
+          { name: "Tracksuits", query: "kids-tracksuit" }
+        ],
       },
     ],
     products: ["Boys", "Girls", "Running", "All Kids"],
   },
   {
     name: "Customize",
+    query: "minimalist-apparel",
     columns: [
       {
         title: "Create",
-        items: ["Design Your Shoe", "Choose Colors", "Add Name", "Preview"],
+        items: [
+          { name: "Design Your Shoe", query: "custom-sneakers-design" },
+          { name: "Choose Colors", query: "sneakers-colors" },
+          { name: "Add Name", query: "custom-shoes" },
+          { name: "Preview", query: "sneakers-template" }
+        ],
       },
       {
         title: "Popular",
         active: true,
-        items: ["Custom Sneakers", "Custom Football", "Custom Running"],
+        items: [
+          { name: "Custom Sneakers", query: "custom-sneakers" },
+          { name: "Custom Football", query: "custom-soccer-shoes" },
+          { name: "Custom Running", query: "custom-running-shoes" }
+        ],
       },
       {
         title: "Help",
-        items: ["How It Works", "Size Guide", "Delivery Time"],
+        items: [
+          { name: "How It Works", query: "shoemaker-craft" },
+          { name: "Size Guide", query: "shoes-size" },
+          { name: "Delivery Time", query: "shipping-logistics" }
+        ],
       },
     ],
     products: ["Sneakers", "Football", "Running", "Custom"],
   },
   {
     name: "Sale",
+    query: "clothes-sale",
     columns: [
       {
         title: "Offers",
-        items: ["Last Chance", "Discount Shoes", "Discount Clothing", "Outlet"],
+        items: [
+          { name: "Last Chance", query: "clothes-clearance" },
+          { name: "Discount Shoes", query: "shoes-sale" },
+          { name: "Discount Clothing", query: "apparel-sale" },
+          { name: "Outlet", query: "clothing-outlet" }
+        ],
       },
       {
         title: "Categories",
         active: true,
-        items: ["Men Sale", "Women Sale", "Kids Sale", "All Sale"],
+        items: [
+          { name: "Men Sale", query: "men-clothes-sale" },
+          { name: "Women Sale", query: "women-clothes-sale" },
+          { name: "Kids Sale", query: "kids-clothes-sale" },
+          { name: "All Sale", query: "clothing-discounts" }
+        ],
       },
       {
         title: "Trending",
-        items: ["Under $50", "Best Deals", "Limited Time"],
+        items: [
+          { name: "Under $50", query: "cheap-minimalist-clothing" },
+          { name: "Best Deals", query: "clothing-offers" },
+          { name: "Limited Time", query: "flash-sale-clothes" }
+        ],
       },
     ],
     products: ["Men Sale", "Women Sale", "Kids Sale", "All Sale"],
   },
 ];
-
-const MenuBar = () => {
+const MenuBar = ({ setCategoria }) => {
   return (
     <header className="navbar">
 
@@ -106,7 +172,10 @@ const MenuBar = () => {
         <nav className="nav-menu">
           {menuItems.map((menu) => (
             <div className="nav-item" key={menu.name}>
-              {menu.name}
+              <span onClick={() => setCategoria(menu.query
+              )}>
+                {menu.name}
+              </span>
 
               <div className="mega-menu">
                 {menu.columns.map((column) => (
@@ -116,7 +185,9 @@ const MenuBar = () => {
                     </h3>
 
                     {column.items.map((item) => (
-                      <p key={item}>{item}</p>
+                      <p key={item.name} onClick={() => setCategoria(item.query)}>
+                        {item.name}
+                      </p>
                     ))}
                   </div>
                 ))}
