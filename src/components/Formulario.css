@@ -1,0 +1,262 @@
+/* ===== SECCIÓN CONTACTO ===== */
+.contacto-section {
+  background: #111;
+  font-family: 'Georgia', serif;
+}
+
+.contacto-header {
+  text-align: center;
+  padding: 80px 40px 40px;
+  border-bottom: 1px solid #222;
+}
+
+.contacto-titulo {
+  font-size: 36px;
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+
+.contacto-sub {
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+}
+
+/* ===== GRID FORMULARIO + INFO ===== */
+.contacto-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  padding: 60px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ===== CAMPOS ===== */
+.contacto-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.contacto-field {
+  margin-bottom: 20px;
+}
+
+.contacto-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: #666;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.contacto-input,
+.contacto-select,
+.contacto-textarea {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #fff;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.contacto-input:focus,
+.contacto-textarea:focus {
+  border-color: #666;
+}
+
+.contacto-input::placeholder,
+.contacto-textarea::placeholder {
+  color: #444;
+}
+
+.contacto-select {
+  color: #888;
+  appearance: none;
+  cursor: pointer;
+}
+
+.contacto-select:focus {
+  border-color: #666;
+  color: #fff;
+}
+
+.contacto-textarea {
+  resize: vertical;
+}
+
+/* ===== CHECKBOX ===== */
+.contacto-check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.contacto-check-label {
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+}
+
+/* ===== BOTÓN ===== */
+.contacto-btn {
+  width: 100%;
+  padding: 14px;
+  background: #fff;
+  color: #111;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.contacto-btn:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.contacto-btn:disabled {
+  background: #222;
+  color: #555;
+  cursor: not-allowed;
+}
+
+/* ===== MENSAJE ÉXITO ===== */
+.contacto-exito {
+  margin-top: 16px;
+  padding: 14px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  color: #aaa;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+/* ===== INFO LATERAL ===== */
+.contacto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-top: 8px;
+}
+
+.contacto-info-item {
+  border-left: 1px solid #2a2a2a;
+  padding-left: 20px;
+}
+
+.contacto-info-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: #555;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.contacto-info-value {
+  font-size: 14px;
+  color: #ccc;
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: #0a0a0a;
+  border-top: 1px solid #222;
+  padding: 60px 80px 30px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.footer-marca {
+  font-size: 20px;
+  font-weight: 400;
+  color: #fff;
+  margin: 0 0 12px;
+  letter-spacing: 0.05em;
+}
+
+.footer-desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.footer-titulo {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: #666;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+
+.footer-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-lista li {
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.footer-lista li:hover {
+  color: #ccc;
+}
+
+.footer-copy {
+  border-top: 1px solid #1a1a1a;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.footer-copy p {
+  font-size: 12px;
+  color: #444;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .contacto-grid {
+    grid-template-columns: 1fr;
+    padding: 40px 24px;
+  }
+  .contacto-row {
+    grid-template-columns: 1fr;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    padding: 40px 24px 20px;
+  }
+  .footer {
+    padding: 40px 24px 20px;
+  }
+}
