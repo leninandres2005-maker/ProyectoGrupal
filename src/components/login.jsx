@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './login-card.css';
 
-// 1. Recibimos la función onLoginSuccess como Prop
 function UserLogin({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -64,7 +63,7 @@ function UserLogin({ onLoginSuccess }) {
           <button type="submit" className="btn-principal">
             {esRegistro ? 'Registrarse' : 'Iniciar Sesión'}
           </button>
-          
+
           <button 
             type="button" 
             className="btn-secundario" 

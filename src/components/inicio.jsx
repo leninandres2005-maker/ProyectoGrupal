@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import MenuBar from './MenuBar.jsx';
 import ListaProductos from './card_ropa.jsx';
 import UserLogin from './login.jsx';
+import BoardCliente from '../Boards/board_cliente.jsx';
 import './inicio.css';
 
 function Inicio() {
@@ -9,10 +10,6 @@ function Inicio() {
   const [categoria, setCategoria] = useState('minimalist-clothing');
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [usuario, setUsuario] = useState(false);
-
-  if (usuario) {
-    return <board_cliente />;
-  }
 
   useEffect(() => {
 
@@ -30,6 +27,10 @@ function Inicio() {
 
   }, []);
 
+  if (usuario) {
+    return <BoardCliente />;
+  }
+
   return (
     <div className="App">
 
@@ -38,7 +39,10 @@ function Inicio() {
       {mostrarLogin && (
         <div className="modal-overlay" onClick={() => setMostrarLogin(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <UserLogin />
+            <UserLogin onLoginSuccess={() => {
+              setUsuario(true);
+              setMostrarLogin(false);
+            }} />
           </div>
         </div>
       )}
@@ -51,11 +55,6 @@ function Inicio() {
             <button onClick={() => setMostrarLogin(true)} className="btn-comprar">Iniciar sesión</button>
         </div>
       </div>
-
-      <UserLogin onLoginSuccess={() => {
-        setUsuario(true);
-        setMostrarLogin(false);
-      }} />
 
       <ListaProductos categoria={categoria} />
     </div>
