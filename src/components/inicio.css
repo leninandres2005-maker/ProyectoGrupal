@@ -165,8 +165,8 @@
   text-transform: capitalize; 
   white-space: normal;
   line-height: 1.3;
-  display: -webkit-box; /* Para limitar a 2 líneas */
-  -webkit-line-clamp: 2; /* Limita a 2 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -183,7 +183,7 @@
 .product-info {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* Centra verticalmente el botón con respecto al bloque de texto */
+  align-items: center;
   padding: 12px 4px 4px 4px;
   width: 100%;
   box-sizing: border-box;
@@ -193,7 +193,7 @@
 .add-to-cart-button {
   background-color: transparent;
   border: 1px solid #111;
-  border-radius: 50%; /* Círculo perfecto */
+  border-radius: 50%;
   width: 42px;
   height: 42px;
   display: flex;

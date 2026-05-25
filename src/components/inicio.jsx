@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import MenuBar from './MenuBar.jsx';
 import ListaProductos from './card_ropa.jsx';
+import UserLogin from './login.jsx';
 import './inicio.css';
 
 function Inicio() {
   const [imagenPortada, setImagenPortada] = useState('');
   const [categoria, setCategoria] = useState('minimalist-clothing');
+  const [mostrarLogin, setMostrarLogin] = useState(true);
 
   useEffect(() => {
 
@@ -28,12 +30,20 @@ function Inicio() {
 
       <MenuBar setCategoria={setCategoria} />
 
+      {mostrarLogin && (
+        <div className="modal-overlay" onClick={() => setMostrarLogin(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <UserLogin />
+          </div>
+        </div>
+      )}
+
       <div
         className="hero-section"
         style={{ backgroundImage: `url(${imagenPortada})` }}
       >
         <div className="hero-overlay">
-          <button className="btn-comprar">Comprar ahora</button>
+            <button onClick={() => setMostrarLogin(true)} className="btn-comprar">Iniciar sesión</button>
         </div>
       </div>
 
