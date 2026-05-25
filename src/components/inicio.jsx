@@ -7,7 +7,12 @@ import './inicio.css';
 function Inicio() {
   const [imagenPortada, setImagenPortada] = useState('');
   const [categoria, setCategoria] = useState('minimalist-clothing');
-  const [mostrarLogin, setMostrarLogin] = useState(true);
+  const [mostrarLogin, setMostrarLogin] = useState(false);
+  const [usuario, setUsuario] = useState(false);
+
+  if (usuario) {
+    return <board_cliente />;
+  }
 
   useEffect(() => {
 
@@ -46,6 +51,11 @@ function Inicio() {
             <button onClick={() => setMostrarLogin(true)} className="btn-comprar">Iniciar sesión</button>
         </div>
       </div>
+
+      <UserLogin onLoginSuccess={() => {
+        setUsuario(true);
+        setMostrarLogin(false);
+      }} />
 
       <ListaProductos categoria={categoria} />
     </div>

@@ -2,14 +2,14 @@ import './App.css';
 import Formulario from './components/Formulario.jsx';
 import Inicio from './components/inicio.jsx';
 import PieDePagina from './components/PieDePagina.jsx';
-import Login from './dasboardAdmin/login.jsx';
-import Dashboard from './dasboardAdmin/dasboard.jsx';
+import Login from './Boards/login_admin.jsx';
+import Dashboard from './Boards/board_admin.jsx';
 
 function App() {
   const path = window.location.pathname.toLowerCase();
 
   const abrirDashboard = () => {
-    window.location.href = '/dashboard';
+    window.location.href = '/Boards';
   };
 
   if (path === '/login') {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './dasboard.css';
+import './board-admin.css';
  
 // ============================================================
 // DATOS DE EJEMPLO — reemplaza con fetch a tu API Java

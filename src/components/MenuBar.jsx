@@ -225,7 +225,7 @@ const MenuBar = ({ setCategoria }) => {
           <span className="icon">♥</span>
           <span className="icon">🛒</span>
           <a className="login-nav-button" href="/login" target="_blank" rel="noreferrer">
-            Login
+            Administrador
           </a>
           
         </div>

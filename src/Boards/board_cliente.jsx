@@ -1,0 +1,201 @@
+import { useState } from 'react';
+import './board-cliente.css'; 
+
+// Datos simulados de los pagos del cliente (luego vendrán de tu backend Java)
+const PAGOS_EJEMPLO = [
+  {
+    id: 101,
+    monto: "$45.00",
+    banco: "Banco Pichincha",
+    estado: "verificando",
+    fecha: "2026-05-24 14:20",
+    comprobante: "comprobante_01.jpg"
+  },
+  {
+    id: 98,
+    monto: "$32.50",
+    banco: "Banco Guayaquil",
+    estado: "aprobado",
+    fecha: "2026-05-18 09:15",
+    comprobante: "comprobante_98.png"
+  }
+];
+
+const ESTADO_COLOR = {
+  aprobado:   { label: "Aprobado", color: "#0f9e6e" },
+  verificando:{ label: "Verificando", color: "#c49a00" },
+  rechazado:  { label: "Rechazado", color: "#e05c2a" },
+};
+
+const BoardCliente = () => {
+  const [filtro, setFiltro] = useState('');
+  const [comprobante, setComprobante] = useState(null);
+  const [vistaCarga, setVistaCarga] = useState(false); 
+
+  const pagos = PAGOS_EJEMPLO;
+
+  const filtrados = pagos.filter(p =>
+    p.banco.toLowerCase().includes(filtro.toLowerCase()) ||
+    p.estado.toLowerCase().includes(filtro.toLowerCase())
+  );
+
+  // Manejar la selección del archivo de imagen
+  const manejarArchivo = (e) => {
+    const archivo = e.target.files[0];
+    if (archivo) {
+      setComprobante(archivo);
+      console.log("Archivo cargado listo para el backend:", archivo.name);
+    }
+  };
+
+  const enviarFormulario = (e) => {
+    e.preventDefault();
+    alert(`¡Comprobante ${comprobante?.name} enviado con éxito para revisión!`);
+    setComprobante(null);
+    setVistaCarga(false);
+  };
+
+  return (
+    <div className="db-root">
+      
+      {/* ── SIDEBAR DEL CLIENTE ── */}
+      <aside className="db-sidebar">
+        <div className="db-brand">
+          <span className="db-brand-mark">▲</span>
+          <span className="db-brand-name">Jenna Moda</span>
+        </div>
+
+        <nav className="db-nav">
+          <button 
+            className={`db-nav-item ${!vistaCarga ? 'active' : ''}`} 
+            onClick={() => setVistaCarga(false)}
+          >
+            <span className="db-nav-icon">📊</span>
+            Mis Pagos
+          </button>
+          <button 
+            className={`db-nav-item ${vistaCarga ? 'active' : ''}`} 
+            onClick={() => setVistaCarga(true)}
+          >
+            <span className="db-nav-icon">📤</span>
+            Subir Depósito
+          </button>
+        </nav>
+
+        <div className="db-sidebar-footer">
+          <div className="db-avatar">U</div>
+          <div>
+            <p className="db-avatar-name">Mi Perfil</p>
+            <p className="db-avatar-role">Cliente Premium</p>
+          </div>
+        </div>
+      </aside>
+
+      {/* ── CONTENIDO PRINCIPAL ── */}
+      <main className="db-main">
+        
+        {/* Renderizado Condicional: O ve sus pagos, o sube un comprobante */}
+        {!vistaCarga ? (
+          <>
+            {/* Cabecera Historial */}
+            <header className="db-header">
+              <div>
+                <h1 className="db-title">Mis Transferencias y Depósitos</h1>
+                <p className="db-subtitle">{filtrados.length} registro(s) encontrado(s)</p>
+              </div>
+              <input
+                className="db-search"
+                placeholder="Buscar por banco o estado..."
+                value={filtro}
+                onChange={e => setFiltro(e.target.value)}
+              />
+            </header>
+
+            {/* Tabla de Historial de Pagos */}
+            <div className="db-table-wrap">
+              <table className="db-table">
+                <thead>
+                  <tr>
+                    <th>ID Orden</th>
+                    <th>Banco</th>
+                    <th>Monto</th>
+                    <th>Fecha Envío</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtrados.map(p => (
+                    <tr key={p.id}>
+                      <td className="db-id">#{p.id}</td>
+                      <td className="db-nombre">{p.banco}</td>
+                      <td className="db-email" style={{ fontWeight: 'bold' }}>{p.monto}</td>
+                      <td className="db-fecha">{p.fecha}</td>
+                      <td>
+                        <span
+                          className="db-badge"
+                          style={{ borderColor: ESTADO_COLOR[p.estado]?.color, color: ESTADO_COLOR[p.estado]?.color }}
+                        >
+                          {ESTADO_COLOR[p.estado]?.label}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Formulario de Carga Estilizado */}
+            <header className="db-header">
+              <div>
+                <h1 className="db-title">Notificar Nuevo Pago</h1>
+                <p className="db-subtitle">Sube una captura clara de tu depósito o transferencia bancaria.</p>
+              </div>
+            </header>
+
+            <div className="upload-container">
+              <form className="upload-form" onSubmit={enviarFormulario}>
+                <div className="upload-field">
+                  <label>Número de Orden / Pedido</label>
+                  <input type="number" placeholder="Ej. 102" required />
+                </div>
+
+                <div className="upload-field">
+                  <label>Banco de Destino</label>
+                  <select required>
+                    <option value="">Selecciona el banco...</option>
+                    <option value="pichincha">Banco Pichincha</option>
+                    <option value="guayaquil">Banco Guayaquil</option>
+                    <option value="produbanco">Produbanco</option>
+                  </select>
+                </div>
+
+                {/* Zona de arrastrar y soltar la foto */}
+                <div className="dropzone">
+                  <span className="dropzone-icon">📷</span>
+                  <label htmlFor="file-upload" className="custom-file-upload">
+                    {comprobante ? `Seleccionado: ${comprobante.name}` : "Seleccionar Comprobante o Foto"}
+                  </label>
+                  <input 
+                    id="file-upload" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={manejarArchivo} 
+                    required 
+                  />
+                </div>
+
+                <button type="submit" className="btn-enviar-pago" disabled={!comprobante}>
+                  Enviar Comprobante
+                </button>
+              </form>
+            </div>
+          </>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default BoardCliente;

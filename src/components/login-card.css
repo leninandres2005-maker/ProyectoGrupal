@@ -1,5 +1,5 @@
 /* ======================================
-    Estilos para el LoginCard
+    Estilos para el Login-Card
     ====================================== */
 .modal-overlay {
   position: fixed;
@@ -14,10 +14,68 @@
   z-index: 1000; /* Asegura que esté al frente de todo */
 }
 
-/* Caja blanca donde vive el formulario */
-.modal-content {
+.login {
   background: white;
-  padding: 20px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 150%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login h2 {
+  font-family: 'Playfair Display', serif;
+  text-align: center;
+  margin-bottom: 5px;
+  color: #111;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.form-group input {
+  padding: 12px;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  position: relative;
+  font-size: 0.9rem;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-principal {
+  background-color: #000;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-secundario {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
 }

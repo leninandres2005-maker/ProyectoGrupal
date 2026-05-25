@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './login.css';
+import './login-admin.css';
 
 const Login = ({ onLogin }) => {
   const [form, setForm] = useState({ usuario: '', password: '' });
