@@ -15,6 +15,11 @@ const validarSupabase = () => {
   }
 };
 
+const lanzarErrorSupabase = (error, accion) => {
+  const detalle = [error.message, error.details, error.hint].filter(Boolean).join(' ');
+  throw new Error(`${accion}: ${detalle || 'Error desconocido de Supabase'}`);
+};
+
 export async function getConsultas() {
   validarSupabase();
 
@@ -22,7 +27,7 @@ export async function getConsultas() {
     .from('consultas')
     .select('*');
 
-  if (error) throw error;
+  if (error) lanzarErrorSupabase(error, 'No se pudieron cargar las consultas');
   return ordenarPorFecha(data);
 }
 
@@ -33,7 +38,7 @@ export async function getPagos() {
     .from('pagos')
     .select('*');
 
-  if (error) throw error;
+  if (error) lanzarErrorSupabase(error, 'No se pudieron cargar los pagos');
   return ordenarPorFecha(data);
 }
 
@@ -55,7 +60,7 @@ export async function guardarConsulta(consulta) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) lanzarErrorSupabase(error, 'No se pudo guardar la consulta');
   return data;
 }
 
@@ -78,6 +83,6 @@ export async function guardarPago(pago) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) lanzarErrorSupabase(error, 'No se pudo guardar el pago');
   return data;
 }

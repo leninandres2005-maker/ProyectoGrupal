@@ -102,7 +102,7 @@ const BoardCliente = ({ carrito, setVista,  }) => {
     } catch (err) {
       console.error('Error al enviar comprobante:', err);
       setError(`Error al enviar el comprobante: ${err.message}`);
-      alert('Error al enviar. Intenta de nuevo.');
+      alert(`Error al enviar: ${err.message}`);
     } finally {
       setEnviando(false);
     }
