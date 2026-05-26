@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { crearConsultaSupabase, supabaseConfigurado } from '../lib/supabaseApi.js';
 import './Formulario.css';
 
 const Formulario = () => {
@@ -7,6 +8,8 @@ const Formulario = () => {
     motivo: '', mensaje: '', newsletter: false
   });
   const [enviado, setEnviado] = useState(false);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState('');
 
   const manejarCambio = (e) => {
     const { name, value, type, checked } = e.target;
@@ -16,26 +19,47 @@ const Formulario = () => {
   const formularioValido = form.nombre && form.apellido &&
     form.email.includes('@') && form.motivo && form.mensaje;
 
-  const manejarEnvio = (e) => {
-    e.preventDefault();
-    if (!formularioValido) return;
-
-    // Guarda en localStorage para que aparezca en el dashboard
+  const guardarEnLocalStorage = (consulta) => {
     const consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
-    const nueva = {
-      id: Date.now(),
-      nombre: form.nombre,
-      apellido: form.apellido,
-      email: form.email,
-      motivo: form.motivo,
-      mensaje: form.mensaje,
-      fecha: new Date().toLocaleString()
-    };
-    consultas.push(nueva);
+    consultas.push(consulta);
     localStorage.setItem('consultas', JSON.stringify(consultas));
+  };
 
-    setEnviado(true);
-    setForm({ nombre: '', apellido: '', email: '', motivo: '', mensaje: '', newsletter: false });
+  const manejarEnvio = async (e) => {
+    e.preventDefault();
+    if (!formularioValido || cargando) return;
+
+    setCargando(true);
+    setError('');
+
+    const nueva = {
+      nombre: form.nombre.trim(),
+      apellido: form.apellido.trim(),
+      email: form.email.trim(),
+      motivo: form.motivo,
+      mensaje: form.mensaje.trim(),
+      newsletter: form.newsletter,
+    };
+
+    try {
+      if (supabaseConfigurado) {
+        await crearConsultaSupabase(nueva);
+      } else {
+        guardarEnLocalStorage({
+          id: Date.now(),
+          ...nueva,
+          fecha: new Date().toLocaleString()
+        });
+      }
+
+      setEnviado(true);
+      setForm({ nombre: '', apellido: '', email: '', motivo: '', mensaje: '', newsletter: false });
+    } catch (err) {
+      console.error('No se pudo guardar la consulta:', err);
+      setError('No se pudo enviar la consulta. Revisa la conexión con Supabase.');
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -85,13 +109,19 @@ const Formulario = () => {
             </label>
           </div>
 
-          <button className="contacto-btn" type="submit" disabled={!formularioValido}>
-            Enviar mensaje
+          <button className="contacto-btn" type="submit" disabled={!formularioValido || cargando}>
+            {cargando ? 'Enviando...' : 'Enviar mensaje'}
           </button>
 
           {enviado && (
             <div className="contacto-exito">
               ✓ Mensaje recibido — te respondemos en menos de 24 horas
+            </div>
+          )}
+
+          {error && (
+            <div className="contacto-exito" style={{ color: '#e05c2a' }}>
+              {error}
             </div>
           )}
         </form>
