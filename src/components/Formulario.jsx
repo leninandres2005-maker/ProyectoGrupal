@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './Formulario.css';
+import { guardarConsulta } from '../api.js';
 
 const Formulario = () => {
   const [form, setForm] = useState({
@@ -16,9 +17,26 @@ const Formulario = () => {
   const formularioValido = form.nombre && form.apellido &&
     form.email.includes('@') && form.motivo && form.mensaje;
 
-  const manejarEnvio = (e) => {
+
+
+  const manejarEnvio = async (e) => {
     e.preventDefault();
     if (!formularioValido) return;
+
+    await guardarConsulta({
+      nombre: form.nombre,
+      apellido: form.apellido,
+      email: form.email,
+      motivo: form.motivo,
+      mensaje: form.mensaje
+    });
+
+    setEnviado(true);
+    setForm({
+      nombre: '', apellido: '', email: '',
+      motivo: '', mensaje: '', newsletter: false
+    });
+  };
 
     // Guarda en localStorage para que aparezca en el dashboard
     const consultas = JSON.parse(localStorage.getItem('consultas') || '[]');

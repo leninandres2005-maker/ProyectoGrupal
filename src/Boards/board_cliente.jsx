@@ -2,27 +2,8 @@ import { useState } from 'react';
 import './board-admin.css'; // Importamos el CSS del admin porque comparte los estilos de la estructura db-
 import './board-cliente.css'; 
 import datos from '../data/productos.json';
+import { getPagos } from '../api.js';
 
-
-// Datos simulados de los pagos del cliente (luego vendrán de tu backend Java)
-const PAGOS_EJEMPLO = [
-  {
-    id: 101,
-    monto: "$45.00",
-    banco: "Banco Pichincha",
-    estado: "verificando",
-    fecha: "2026-05-24 14:20",
-    comprobante: "comprobante_01.jpg"
-  },
-  {
-    id: 98,
-    monto: "$32.50",
-    banco: "Banco Guayaquil",
-    estado: "aprobado",
-    fecha: "2026-05-18 09:15",
-    comprobante: "comprobante_98.png"
-  }
-];
 
 const ESTADO_COLOR = {
   aprobado:   { label: "Aprobado", color: "#0f9e6e" },
@@ -35,7 +16,30 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
   const [comprobante, setComprobante] = useState(null);
   const [seccion, setSeccion] = useState('pagos'); // 'pagos', 'carga', 'carrito'
 
-  const pagos = datos.pagos;
+
+
+
+ const [pagos, setPagos] = useState([]);
+
+useEffect(() => {
+  const cargar = async () => {
+    const data = await getPagos();
+    setPagos(data);
+  };
+  cargar();
+}, []);
+
+const enviarFormulario = async (e) => {
+  e.preventDefault();
+  await guardarPago({
+    id_orden: e.target[0].value,
+    banco: e.target[1].value,
+    archivo: comprobante?.name || ''
+  });
+  alert('Comprobante enviado');
+  setComprobante(null);
+  setSeccion('pagos');
+};
 
   const filtrados = pagos.filter(p =>
     p.banco.toLowerCase().includes(filtro.toLowerCase()) ||

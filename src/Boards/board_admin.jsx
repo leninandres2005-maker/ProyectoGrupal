@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import datos from '../data/productos.json';
 import './board-admin.css';
-
+import { getConsultas } from '../api';
 const MOTIVO_COLOR = {
   pedido:     { label: "Pedido",     color: "#1a6aff" },
   tallas:     { label: "Tallas",     color: "#0f9e6e" },
@@ -23,10 +23,17 @@ const Dashboard = () => {
     setConsultas(todas);
   };
 
-  useEffect(() => {
-    cargarConsultas();
-    // Se actualiza cada 3 segundos para mostrar nuevas consultas del formulario
-    const intervalo = setInterval(cargarConsultas, 3000);
+
+
+
+    useEffect(() => {
+      const cargar = async () => {
+        const data = await getConsultas();
+        setConsultas(data);
+      };
+
+    cargar();
+    const intervalo = setInterval(cargar, 5000);
     return () => clearInterval(intervalo);
   }, []);
 
