@@ -8,6 +8,8 @@ const Formulario = () => {
     motivo: '', mensaje: '', newsletter: false
   });
   const [enviado, setEnviado] = useState(false);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState('');
 
   const manejarCambio = (e) => {
     const { name, value, type, checked } = e.target;
@@ -17,43 +19,38 @@ const Formulario = () => {
   const formularioValido = form.nombre && form.apellido &&
     form.email.includes('@') && form.motivo && form.mensaje;
 
-
-
   const manejarEnvio = async (e) => {
     e.preventDefault();
-    if (!formularioValido) return;
+    if (!formularioValido || cargando) return;
 
-    await guardarConsulta({
-      nombre: form.nombre,
-      apellido: form.apellido,
-      email: form.email,
-      motivo: form.motivo,
-      mensaje: form.mensaje
-    });
+    setCargando(true);
+    setError('');
 
-    setEnviado(true);
-    setForm({
-      nombre: '', apellido: '', email: '',
-      motivo: '', mensaje: '', newsletter: false
-    });
-  };
-
-    // Guarda en localStorage para que aparezca en el dashboard
-    const consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
     const nueva = {
-      id: Date.now(),
-      nombre: form.nombre,
-      apellido: form.apellido,
-      email: form.email,
+      nombre: form.nombre.trim(),
+      apellido: form.apellido.trim(),
+      email: form.email.trim(),
       motivo: form.motivo,
-      mensaje: form.mensaje,
-      fecha: new Date().toLocaleString()
+      mensaje: form.mensaje.trim(),
     };
-    consultas.push(nueva);
-    localStorage.setItem('consultas', JSON.stringify(consultas));
 
-    setEnviado(true);
-    setForm({ nombre: '', apellido: '', email: '', motivo: '', mensaje: '', newsletter: false });
+    try {
+      // Guarda en Supabase
+      await guardarConsulta(nueva);
+
+      // También guarda en localStorage para que el dashboard local lo vea inmediatamente
+      const consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
+      consultas.push({ id: Date.now(), ...nueva, fecha: new Date().toLocaleString() });
+      localStorage.setItem('consultas', JSON.stringify(consultas));
+
+      setEnviado(true);
+      setForm({ nombre: '', apellido: '', email: '', motivo: '', mensaje: '', newsletter: false });
+    } catch (err) {
+      console.error('Error al guardar consulta:', err);
+      setError('No se pudo enviar. Intenta de nuevo.');
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -103,13 +100,18 @@ const Formulario = () => {
             </label>
           </div>
 
-          <button className="contacto-btn" type="submit" disabled={!formularioValido}>
-            Enviar mensaje
+          <button className="contacto-btn" type="submit" disabled={!formularioValido || cargando}>
+            {cargando ? 'Enviando...' : 'Enviar mensaje'}
           </button>
 
           {enviado && (
             <div className="contacto-exito">
               ✓ Mensaje recibido — te respondemos en menos de 24 horas
+            </div>
+          )}
+          {error && (
+            <div className="contacto-exito" style={{ color: '#e05c2a' }}>
+              {error}
             </div>
           )}
         </form>

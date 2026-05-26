@@ -31,7 +31,7 @@ useEffect(() => {
 
 const enviarFormulario = async (e) => {
   e.preventDefault();
-  await guardarPago({
+  await guardarPago ({
     id_orden: e.target[0].value,
     banco: e.target[1].value,
     archivo: comprobante?.name || ''
@@ -55,12 +55,6 @@ const enviarFormulario = async (e) => {
     }
   };
 
-  const enviarFormulario = (e) => {
-    e.preventDefault();
-    alert(`¡Comprobante ${comprobante?.name} enviado con éxito para revisión!`);
-    setComprobante(null);
-    setSeccion('pagos');
-  };
 
   return (
     <div className="db-root">
