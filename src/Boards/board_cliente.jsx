@@ -17,6 +17,27 @@ const leerArchivoComoDataUrl = (archivo) =>
     reader.readAsDataURL(archivo);
   });
 
+const comprimirImagen = async (archivo) => {
+  const dataUrl = await leerArchivoComoDataUrl(archivo);
+
+  return new Promise((resolve) => {
+    const imagen = new Image();
+    imagen.onload = () => {
+      const maxSize = 900;
+      const escala = Math.min(maxSize / imagen.width, maxSize / imagen.height, 1);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(imagen.width * escala);
+      canvas.height = Math.round(imagen.height * escala);
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(imagen, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.78));
+    };
+    imagen.onerror = () => resolve(dataUrl);
+    imagen.src = dataUrl;
+  });
+};
+
 const BoardCliente = ({ carrito, setVista,  }) => {
   const [filtro, setFiltro]           = useState('');
   const [comprobante, setComprobante] = useState(null);       // File object
@@ -78,7 +99,7 @@ const BoardCliente = ({ carrito, setVista,  }) => {
     try {
       const formulario = e.currentTarget;
       const formData = new FormData(formulario);
-      const base64 = await leerArchivoComoDataUrl(comprobante);
+      const base64 = await comprimirImagen(comprobante);
 
       await guardarPago({
         id_orden: formData.get('id_orden'),

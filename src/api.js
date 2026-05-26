@@ -1,6 +1,4 @@
-import { supabase, supabaseConfigurado } from './supabase/supabaseClient.js';
-
-export { supabaseConfigurado };
+import db from './data/db.json';
 
 const ordenarPorFecha = (registros) =>
   [...(registros || [])].sort((a, b) => {
@@ -9,43 +7,58 @@ const ordenarPorFecha = (registros) =>
     return fechaB - fechaA;
   });
 
-const validarSupabase = () => {
-  if (!supabaseConfigurado || !supabase) {
-    throw new Error('Supabase no esta configurado. Revisa VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.');
+const leerJsonLocal = (tabla) => {
+  if (typeof localStorage === 'undefined') return [];
+
+  const claveNueva = `jenna_${tabla}`;
+  const claveAnterior = tabla;
+  const datosGuardados = localStorage.getItem(claveNueva) || localStorage.getItem(claveAnterior);
+
+  if (!datosGuardados) return [];
+
+  try {
+    const registros = JSON.parse(datosGuardados);
+    return Array.isArray(registros) ? registros : [];
+  } catch (error) {
+    console.warn(`No se pudo leer ${tabla} desde localStorage:`, error);
+    return [];
   }
 };
 
-const lanzarErrorSupabase = (error, accion) => {
-  const detalle = [error.message, error.details, error.hint].filter(Boolean).join(' ');
-  throw new Error(`${accion}: ${detalle || 'Error desconocido de Supabase'}`);
+const escribirJsonLocal = (tabla, registros) => {
+  if (typeof localStorage === 'undefined') return;
+  localStorage.setItem(`jenna_${tabla}`, JSON.stringify(registros));
+};
+
+const unirSinDuplicados = (base, locales) => {
+  const idsLocales = new Set(locales.map(registro => String(registro.id)));
+  return [
+    ...locales,
+    ...(base || []).filter(registro => !idsLocales.has(String(registro.id))),
+  ];
+};
+
+const siguienteId = (registros) => {
+  const maxId = registros.reduce((max, registro) => {
+    const id = Number(registro.id);
+    return Number.isFinite(id) && id > max ? id : max;
+  }, 0);
+
+  return Math.max(Date.now(), maxId + 1);
 };
 
 export async function getConsultas() {
-  validarSupabase();
-
-  const { data, error } = await supabase
-    .from('consultas')
-    .select('*');
-
-  if (error) lanzarErrorSupabase(error, 'No se pudieron cargar las consultas');
-  return ordenarPorFecha(data);
+  return ordenarPorFecha(unirSinDuplicados(db.consultas, leerJsonLocal('consultas')));
 }
 
 export async function getPagos() {
-  validarSupabase();
-
-  const { data, error } = await supabase
-    .from('pagos')
-    .select('*');
-
-  if (error) lanzarErrorSupabase(error, 'No se pudieron cargar los pagos');
-  return ordenarPorFecha(data);
+  return ordenarPorFecha(unirSinDuplicados(db.pagos, leerJsonLocal('pagos')));
 }
 
 export async function guardarConsulta(consulta) {
-  validarSupabase();
-
+  const consultas = leerJsonLocal('consultas');
   const nuevoRegistro = {
+    id: consulta.id || siguienteId([...db.consultas, ...consultas]),
     nombre: consulta.nombre?.trim(),
     apellido: consulta.apellido?.trim(),
     email: consulta.email?.trim(),
@@ -54,20 +67,14 @@ export async function guardarConsulta(consulta) {
     fecha: consulta.fecha || new Date().toLocaleString(),
   };
 
-  const { data, error } = await supabase
-    .from('consultas')
-    .insert([nuevoRegistro])
-    .select()
-    .single();
-
-  if (error) lanzarErrorSupabase(error, 'No se pudo guardar la consulta');
-  return data;
+  escribirJsonLocal('consultas', [nuevoRegistro, ...consultas]);
+  return nuevoRegistro;
 }
 
 export async function guardarPago(pago) {
-  validarSupabase();
-
+  const pagos = leerJsonLocal('pagos');
   const nuevoRegistro = {
+    id: pago.id || siguienteId([...db.pagos, ...pagos]),
     id_orden: pago.id_orden,
     banco: pago.banco,
     monto: pago.monto,
@@ -77,12 +84,6 @@ export async function guardarPago(pago) {
     fecha: pago.fecha || new Date().toLocaleString(),
   };
 
-  const { data, error } = await supabase
-    .from('pagos')
-    .insert([nuevoRegistro])
-    .select()
-    .single();
-
-  if (error) lanzarErrorSupabase(error, 'No se pudo guardar el pago');
-  return data;
+  escribirJsonLocal('pagos', [nuevoRegistro, ...pagos]);
+  return nuevoRegistro;
 }

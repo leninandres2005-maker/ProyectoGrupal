@@ -41,13 +41,10 @@ const Formulario = () => {
     try {
       await guardarConsulta(nuevaConsulta);
     } catch (err) {
-      console.error('Error guardando consulta en Supabase:', err);
-      setError('No se pudo guardar en Supabase, pero se guardó localmente para revisión.');
+      console.error('Error guardando consulta en JSON local:', err);
+      setError('No se pudo guardar el mensaje en la base JSON local.');
+      return;
     }
-
-    const consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
-    consultas.push(nuevaConsulta);
-    localStorage.setItem('consultas', JSON.stringify(consultas));
 
     setEnviado(true);
     setForm({

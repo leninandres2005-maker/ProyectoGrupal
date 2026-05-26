@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getConsultas, getPagos, supabaseConfigurado } from '../api.js';
+import { getConsultas, getPagos } from '../api.js';
 import './board-admin.css';
 
 const MOTIVO_COLOR = {
@@ -297,41 +297,19 @@ const Dashboard = () => {
   const [consultas, setConsultas]   = useState([]);
   const [pagos, setPagos]           = useState([]);
   const [cargando, setCargando]     = useState(true);
-  const [fuenteDatos, setFuenteDatos] = useState('local');
   const [imagenModal, setImagenModal] = useState(null); // URL de imagen a mostrar en modal
   const [error, setError]           = useState('');
 
   const cargarDatos = useCallback(async () => {
     setError('');
-    const delFormulario = JSON.parse(localStorage.getItem('consultas') || '[]');
 
-    if (supabaseConfigurado) {
-      try {
-        const datos_sb = await getConsultas();
-        const emailsMensajes = new Set(datos_sb.map(c => `${c.email}|${c.mensaje}`));
-        const soloLocales = delFormulario.filter(c => !emailsMensajes.has(`${c.email}|${c.mensaje}`));
-        setConsultas([...datos_sb, ...soloLocales]);
-        setFuenteDatos('supabase');
-      } catch (err) {
-        console.warn('Supabase no disponible:', err.message);
-        setConsultas(delFormulario);
-        setFuenteDatos('local');
-        setError(`No se pudieron cargar consultas desde Supabase: ${err.message}`);
-      }
-    } else {
-      setConsultas(delFormulario);
-      setFuenteDatos('local');
-      setError('Supabase no esta configurado. Revisa las variables VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.');
-    }
+    const [consultasData, pagosData] = await Promise.all([
+      getConsultas(),
+      getPagos(),
+    ]);
 
-    try {
-      const pagosData = await getPagos();
-      setPagos(pagosData);
-    } catch (err) {
-      console.warn('Error cargando pagos:', err.message);
-      setPagos([]);
-      setError(prev => prev || `No se pudieron cargar pagos desde Supabase: ${err.message}`);
-    }
+    setConsultas(consultasData);
+    setPagos(pagosData);
 
     setCargando(false);
   }, []);
@@ -384,8 +362,8 @@ const Dashboard = () => {
           <div className="db-avatar">A</div>
           <div>
             <p className="db-avatar-name">Admin</p>
-            <p className="db-avatar-role" style={{ color: fuenteDatos === 'supabase' ? '#0f9e6e' : '#666' }}>
-              {fuenteDatos === 'supabase' ? '● Supabase' : '● Local'}
+            <p className="db-avatar-role" style={{ color: '#0f9e6e' }}>
+              ● JSON Local
             </p>
           </div>
         </div>
@@ -414,7 +392,7 @@ const Dashboard = () => {
                   <div className="db-stat"><p className="db-stat-num">{consultas.length}</p><p className="db-stat-label">Total consultas</p></div>
                   <div className="db-stat"><p className="db-stat-num" style={{ color: '#1a6aff' }}>{consultas.filter(c => c.motivo === 'pedido').length}</p><p className="db-stat-label">Pedidos</p></div>
                   <div className="db-stat"><p className="db-stat-num" style={{ color: '#e05c2a' }}>{consultas.filter(c => c.motivo === 'devolucion').length}</p><p className="db-stat-label">Devoluciones</p></div>
-                  <div className="db-stat"><p className="db-stat-num" style={{ color: '#0f9e6e' }}>{JSON.parse(localStorage.getItem('consultas') || '[]').length}</p><p className="db-stat-label">Nuevas (formulario)</p></div>
+                  <div className="db-stat"><p className="db-stat-num" style={{ color: '#0f9e6e' }}>{consultas.length}</p><p className="db-stat-label">Base JSON</p></div>
                 </div>
                 <div className="db-table-wrap">
                   <table className="db-table">

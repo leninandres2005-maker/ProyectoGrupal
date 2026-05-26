@@ -11,37 +11,43 @@
     },
     {
       "id": 2,
-      "nombre": "Luis Méndez",
-      "apellido": "Méndez",
+      "nombre": "Luis Mendez",
+      "apellido": "Mendez",
       "email": "luis@correo.com",
       "motivo": "tallas",
-      "mensaje": "Necesito la guía de tallas para jeans de mujer.",
+      "mensaje": "Necesito la guia de tallas para jeans de mujer.",
       "fecha": "2026-05-22 11:10"
     },
     {
       "id": 3,
-      "nombre": "María Vega",
+      "nombre": "Maria Vega",
       "apellido": "Vega",
       "email": "maria@correo.com",
       "motivo": "devolucion",
-      "mensaje": "Recibí una prenda incorrecta, quiero hacer el cambio.",
+      "mensaje": "Recibi una prenda incorrecta, quiero hacer el cambio.",
       "fecha": "2026-05-22 14:55"
     }
   ],
   "pagos": [
     {
       "id": 101,
-      "monto": "$45.00",
+      "id_orden": "2045",
+      "monto": 45,
       "banco": "Banco Pichincha",
       "estado": "verificando",
-      "fecha": "2026-05-24 14:20"
+      "fecha": "2026-05-24 14:20",
+      "archivo": "",
+      "imagen": ""
     },
     {
       "id": 98,
-      "monto": "$32.50",
+      "id_orden": "2031",
+      "monto": 32.5,
       "banco": "Banco Guayaquil",
       "estado": "aprobado",
-      "fecha": "2026-05-18 09:15"
+      "fecha": "2026-05-18 09:15",
+      "archivo": "",
+      "imagen": ""
     }
   ]
 }
