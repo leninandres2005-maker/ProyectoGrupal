@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import datos from '../data/productos.json';
-import { obtenerConsultasSupabase, supabaseConfigurado } from '../lib/supabaseApi.js';
+import { getConsultas, supabaseConfigurado } from '../api.js';
 import { getPagos } from '../api.js';
 import './board-admin.css';
 
@@ -313,7 +313,7 @@ const Dashboard = () => {
     // Cargar consultas
     if (supabaseConfigurado) {
       try {
-        const datos_sb = await obtenerConsultasSupabase();
+        const datos_sb = await getConsultas();
         if (datos_sb && datos_sb.length >= 0) {
           const delFormulario = JSON.parse(localStorage.getItem('consultas') || '[]');
           const emailsMensajes = new Set(datos_sb.map(c => `${c.email}|${c.mensaje}`));

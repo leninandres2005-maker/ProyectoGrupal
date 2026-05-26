@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './board-admin.css';
 import './board-cliente.css';
-import { getPagos, guardarPago } from '../lib/supebaseApi';
+import { getPagos, guardarPago } from '../api.js';
 
 const ESTADO_COLOR = {
   aprobado:    { label: "Aprobado",    color: "#0f9e6e" },
@@ -49,9 +49,23 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
   };
 
   // ── Enviar formulario de comprobante ─────────────────────────────────────
-  const enviarFormulario = async (e) => {
-    e.preventDefault();
-    if (!comprobante) return;
+const enviarFormulario = async (e) => {
+  e.preventDefault();
+
+  await guardarPago({
+    id_orden: e.target[0].value,
+    banco: e.target[1].value,
+    estado: 'verificando',
+    archivo: comprobante?.name || ''
+  });
+
+  alert('Comprobante enviado');
+  setComprobante(null);
+  setSeccion('pagos');
+
+  const data = await getPagos();
+  setPagos(data);
+};
 
     setEnviando(true);
     try {
