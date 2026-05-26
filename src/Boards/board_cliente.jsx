@@ -1,67 +1,126 @@
-import { useState } from 'react';
-import './board-admin.css'; // Importamos el CSS del admin porque comparte los estilos de la estructura db-
-import './board-cliente.css'; 
+import { useEffect, useState } from 'react';
+import './board-admin.css';
+import './board-cliente.css';
 import datos from '../data/productos.json';
-
-
-// Datos simulados de los pagos del cliente (luego vendrán de tu backend Java)
-const PAGOS_EJEMPLO = [
-  {
-    id: 101,
-    monto: "$45.00",
-    banco: "Banco Pichincha",
-    estado: "verificando",
-    fecha: "2026-05-24 14:20",
-    comprobante: "comprobante_01.jpg"
-  },
-  {
-    id: 98,
-    monto: "$32.50",
-    banco: "Banco Guayaquil",
-    estado: "aprobado",
-    fecha: "2026-05-18 09:15",
-    comprobante: "comprobante_98.png"
-  }
-];
+import { crearPagoSupabase, obtenerPagosSupabase, supabaseConfigurado } from '../lib/supabaseApi.js';
 
 const ESTADO_COLOR = {
-  aprobado:   { label: "Aprobado", color: "#0f9e6e" },
-  verificando:{ label: "Verificando", color: "#c49a00" },
-  rechazado:  { label: "Rechazado", color: "#e05c2a" },
+  aprobado:    { label: 'Aprobado',    color: '#0f9e6e' },
+  verificando: { label: 'Verificando', color: '#c49a00' },
+  rechazado:   { label: 'Rechazado',   color: '#e05c2a' },
+  pendiente:   { label: 'Pendiente',   color: '#1a6aff' },
 };
 
-const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
+const formatearFecha = (valor) => {
+  if (!valor) return 'Sin fecha';
+  const fecha = new Date(valor);
+  if (Number.isNaN(fecha.getTime())) return valor;
+  return fecha.toLocaleString();
+};
+
+const normalizarPago = (pago) => ({
+  ...pago,
+  id: pago.id || pago.orden || pago.created_at || Date.now(),
+  banco: pago.banco || 'Sin banco',
+  monto: typeof pago.monto === 'number' ? `$${pago.monto.toFixed(2)}` : pago.monto,
+  estado: pago.estado || 'pendiente',
+  fecha: pago.fecha || formatearFecha(pago.created_at),
+});
+
+const BoardCliente = ({ carrito, setUsuario, setVista }) => {
   const [filtro, setFiltro] = useState('');
   const [comprobante, setComprobante] = useState(null);
-  const [seccion, setSeccion] = useState('pagos'); // 'pagos', 'carga', 'carrito'
+  const [seccion, setSeccion] = useState('pagos');
+  const [pagos, setPagos] = useState([]);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState('');
+  const [formPago, setFormPago] = useState({ orden: '', banco: '', monto: '' });
 
-  const pagos = datos.pagos;
-
-  const filtrados = pagos.filter(p =>
-    p.banco.toLowerCase().includes(filtro.toLowerCase()) ||
-    p.estado.toLowerCase().includes(filtro.toLowerCase())
-  );
-
-  // Manejar la selección del archivo de imagen
-  const manejarArchivo = (e) => {
-    const archivo = e.target.files[0];
-    if (archivo) {
-      setComprobante(archivo);
-      console.log("Archivo cargado listo para el backend:", archivo.name);
+  const cargarPagos = async () => {
+    try {
+      if (supabaseConfigurado) {
+        const pagosDb = await obtenerPagosSupabase();
+        setPagos((pagosDb || []).map(normalizarPago));
+      } else {
+        const pagosLocales = JSON.parse(localStorage.getItem('pagos') || '[]');
+        setPagos([...(datos.pagos || []), ...pagosLocales].map(normalizarPago));
+      }
+    } catch (err) {
+      console.error('Error cargando pagos:', err);
+      setError('No se pudieron cargar los pagos desde Supabase. Se muestran datos locales.');
+      const pagosLocales = JSON.parse(localStorage.getItem('pagos') || '[]');
+      setPagos([...(datos.pagos || []), ...pagosLocales].map(normalizarPago));
     }
   };
 
-  const enviarFormulario = (e) => {
+  useEffect(() => {
+    cargarPagos();
+  }, []);
+
+  const filtrados = pagos.filter(p =>
+    (p.banco || '').toLowerCase().includes(filtro.toLowerCase()) ||
+    (p.estado || '').toLowerCase().includes(filtro.toLowerCase()) ||
+    String(p.id || '').includes(filtro)
+  );
+
+  const manejarArchivo = (e) => {
+    const archivo = e.target.files[0];
+    if (archivo) setComprobante(archivo);
+  };
+
+  const manejarCambioPago = (e) => {
+    const { name, value } = e.target;
+    setFormPago({ ...formPago, [name]: value });
+  };
+
+  const guardarPagoLocal = (pago) => {
+    const pagosLocales = JSON.parse(localStorage.getItem('pagos') || '[]');
+    pagosLocales.push(pago);
+    localStorage.setItem('pagos', JSON.stringify(pagosLocales));
+  };
+
+  const enviarFormulario = async (e) => {
     e.preventDefault();
-    alert(`¡Comprobante ${comprobante?.name} enviado con éxito para revisión!`);
-    setComprobante(null);
-    setSeccion('pagos');
+    if (!comprobante || cargando) return;
+
+    setCargando(true);
+    setError('');
+
+    const nuevoPago = {
+      orden: formPago.orden,
+      banco: formPago.banco,
+      monto: Number(formPago.monto),
+      estado: 'verificando',
+      comprobante_nombre: comprobante.name,
+    };
+
+    try {
+      if (supabaseConfigurado) {
+        await crearPagoSupabase(nuevoPago);
+      } else {
+        guardarPagoLocal({
+          id: formPago.orden || Date.now(),
+          ...nuevoPago,
+          monto: `$${Number(formPago.monto).toFixed(2)}`,
+          fecha: new Date().toLocaleString(),
+        });
+      }
+
+      setComprobante(null);
+      setFormPago({ orden: '', banco: '', monto: '' });
+      setSeccion('pagos');
+      await cargarPagos();
+      alert('¡Comprobante enviado con éxito para revisión!');
+    } catch (err) {
+      console.error('No se pudo guardar el pago:', err);
+      setError('No se pudo enviar el comprobante. Revisa la conexión con Supabase.');
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
     <div className="db-root">
-      
-      {/* ── SIDEBAR DEL CLIENTE ── */}
       <aside className="db-sidebar">
         <div className="db-brand">
           <span className="db-brand-mark">▲</span>
@@ -69,33 +128,21 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
         </div>
 
         <nav className="db-nav">
-          <button 
-            className={`db-nav-item ${seccion === 'pagos' ? 'active' : ''}`} 
-            onClick={() => setSeccion('pagos')}
-          >
+          <button className={`db-nav-item ${seccion === 'pagos' ? 'active' : ''}`} onClick={() => setSeccion('pagos')}>
             <span className="db-nav-icon">📊</span>
             Mis Pagos
           </button>
-          <button 
-            className={`db-nav-item ${seccion === 'carrito' ? 'active' : ''}`} 
-            onClick={() => setSeccion('carrito')}
-          >
+          <button className={`db-nav-item ${seccion === 'carrito' ? 'active' : ''}`} onClick={() => setSeccion('carrito')}>
             <span className="db-nav-icon">🛒</span>
             Mi Carrito ({carrito.length})
           </button>
-          <button 
-            className={`db-nav-item ${seccion === 'carga' ? 'active' : ''}`} 
-            onClick={() => setSeccion('carga')}
-          >
+          <button className={`db-nav-item ${seccion === 'carga' ? 'active' : ''}`} onClick={() => setSeccion('carga')}>
             <span className="db-nav-icon">📤</span>
             Subir Depósito
           </button>
         </nav>
 
-        <div className="db-sidebar-footer" onClick={() => {
-          setVista('tienda');
-          // Opcional: setUsuario(false) si quieres que cierre sesión
-        }} style={{cursor: 'pointer'}}>
+        <div className="db-sidebar-footer" onClick={() => { setVista('tienda'); }} style={{ cursor: 'pointer' }}>
           <div className="db-avatar">U</div>
           <div>
             <p className="db-avatar-name">Volver a Tienda</p>
@@ -104,27 +151,19 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
         </div>
       </aside>
 
-      {/* ── CONTENIDO PRINCIPAL ── */}
       <main className="db-main">
-        
-        {/* Renderizado Condicional: O ve sus pagos, o sube un comprobante */}
+        {error && <div className="db-alert">{error}</div>}
+
         {seccion === 'pagos' && (
           <>
-            {/* Cabecera Historial */}
             <header className="db-header">
               <div>
                 <h1 className="db-title">Mis Transferencias y Depósitos</h1>
                 <p className="db-subtitle">{filtrados.length} registro(s) encontrado(s)</p>
               </div>
-              <input
-                className="db-search"
-                placeholder="Buscar por banco o estado..."
-                value={filtro}
-                onChange={e => setFiltro(e.target.value)}
-              />
+              <input className="db-search" placeholder="Buscar por banco, estado u orden..." value={filtro} onChange={e => setFiltro(e.target.value)} />
             </header>
 
-            {/* Tabla de Historial de Pagos */}
             <div className="db-table-wrap">
               <table className="db-table">
                 <thead>
@@ -134,27 +173,27 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
                     <th>Monto</th>
                     <th>Fecha Envío</th>
                     <th>Estado</th>
+                    <th>Comprobante</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtrados.map(p => (
                     <tr key={p.id}>
-                      <td className="db-id">#{p.id}</td>
+                      <td className="db-id">#{p.orden || p.id}</td>
                       <td className="db-nombre">{p.banco}</td>
                       <td className="db-email" style={{ fontWeight: 'bold' }}>{p.monto}</td>
                       <td className="db-fecha">{p.fecha}</td>
                       <td>
-                        <span
-                          className="db-badge"
-                          style={{ borderColor: ESTADO_COLOR[p.estado]?.color, color: ESTADO_COLOR[p.estado]?.color }}
-                        >
-                          {ESTADO_COLOR[p.estado]?.label}
+                        <span className="db-badge" style={{ borderColor: ESTADO_COLOR[p.estado]?.color || '#555', color: ESTADO_COLOR[p.estado]?.color || '#555' }}>
+                          {ESTADO_COLOR[p.estado]?.label || p.estado}
                         </span>
                       </td>
+                      <td className="db-mensaje">{p.comprobante_nombre || p.comprobante || 'Sin archivo'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {filtrados.length === 0 && <p className="db-empty">No existen pagos registrados.</p>}
             </div>
           </>
         )}
@@ -179,7 +218,7 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
                     <td className="db-nombre">{item.nombre}</td>
                     <td>{item.cantidad}</td>
                     <td>${item.precio}</td>
-                    <td style={{color: 'white'}}>${item.precio * item.cantidad}</td>
+                    <td style={{ color: 'white' }}>${item.precio * item.cantidad}</td>
                   </tr>
                 ))}
               </tbody>
@@ -190,7 +229,6 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
 
         {seccion === 'carga' && (
           <>
-            {/* Formulario de Carga Estilizado */}
             <header className="db-header">
               <div>
                 <h1 className="db-title">Notificar Nuevo Pago</h1>
@@ -202,36 +240,34 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
               <form className="upload-form" onSubmit={enviarFormulario}>
                 <div className="upload-field">
                   <label>Número de Orden / Pedido</label>
-                  <input type="number" placeholder="Ej. 102" required />
+                  <input type="number" name="orden" value={formPago.orden} onChange={manejarCambioPago} placeholder="Ej. 102" required />
                 </div>
 
                 <div className="upload-field">
                   <label>Banco de Destino</label>
-                  <select required>
+                  <select name="banco" value={formPago.banco} onChange={manejarCambioPago} required>
                     <option value="">Selecciona el banco...</option>
-                    <option value="pichincha">Banco Pichincha</option>
-                    <option value="guayaquil">Banco Guayaquil</option>
-                    <option value="produbanco">Produbanco</option>
+                    <option value="Banco Pichincha">Banco Pichincha</option>
+                    <option value="Banco Guayaquil">Banco Guayaquil</option>
+                    <option value="Produbanco">Produbanco</option>
                   </select>
                 </div>
 
-                {/* Zona de arrastrar y soltar la foto */}
+                <div className="upload-field">
+                  <label>Monto transferido</label>
+                  <input type="number" min="0" step="0.01" name="monto" value={formPago.monto} onChange={manejarCambioPago} placeholder="Ej. 45.00" required />
+                </div>
+
                 <div className="dropzone">
                   <span className="dropzone-icon">📷</span>
                   <label htmlFor="file-upload" className="custom-file-upload">
-                    {comprobante ? `Seleccionado: ${comprobante.name}` : "Seleccionar Comprobante o Foto"}
+                    {comprobante ? `Seleccionado: ${comprobante.name}` : 'Seleccionar Comprobante o Foto'}
                   </label>
-                  <input 
-                    id="file-upload" 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={manejarArchivo} 
-                    required 
-                  />
+                  <input id="file-upload" type="file" accept="image/*" onChange={manejarArchivo} required />
                 </div>
 
-                <button type="submit" className="btn-enviar-pago" disabled={!comprobante}>
-                  Enviar Comprobante
+                <button type="submit" className="btn-enviar-pago" disabled={!comprobante || cargando}>
+                  {cargando ? 'Enviando...' : 'Enviar Comprobante'}
                 </button>
               </form>
             </div>
