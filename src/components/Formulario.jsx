@@ -19,22 +19,33 @@ const Formulario = () => {
   const manejarEnvio = (e) => {
     e.preventDefault();
     if (!formularioValido) return;
-    console.log('Datos:', form);
+
+    // Guarda en localStorage para que aparezca en el dashboard
+    const consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
+    const nueva = {
+      id: Date.now(),
+      nombre: form.nombre,
+      apellido: form.apellido,
+      email: form.email,
+      motivo: form.motivo,
+      mensaje: form.mensaje,
+      fecha: new Date().toLocaleString()
+    };
+    consultas.push(nueva);
+    localStorage.setItem('consultas', JSON.stringify(consultas));
+
     setEnviado(true);
+    setForm({ nombre: '', apellido: '', email: '', motivo: '', mensaje: '', newsletter: false });
   };
 
   return (
     <section className="contacto-section">
-
-      {/* Título */}
       <div className="contacto-header">
         <h2 className="contacto-titulo">Contáctanos</h2>
         <p className="contacto-sub">Consultas sobre colecciones, tallas o pedidos</p>
       </div>
 
       <div className="contacto-grid">
-
-        {/* Formulario */}
         <form className="contacto-form" onSubmit={manejarEnvio}>
           <div className="contacto-row">
             <div className="contacto-field">
@@ -80,12 +91,11 @@ const Formulario = () => {
 
           {enviado && (
             <div className="contacto-exito">
-               Mensaje recibido — te respondemos en menos de 24 horas
+              ✓ Mensaje recibido — te respondemos en menos de 24 horas
             </div>
           )}
         </form>
 
-        {/* Info lateral */}
         <div className="contacto-info">
           <div className="contacto-info-item">
             <p className="contacto-info-label">Tienda principal</p>
@@ -97,12 +107,10 @@ const Formulario = () => {
           </div>
           <div className="contacto-info-item">
             <p className="contacto-info-label">Contacto directo</p>
-            <p className="contacto-info-value">OlaKeAses@lensitoMuejeje.ec<br />+593 99 729 4120</p>
+            <p className="contacto-info-value">contacto@jennamoda.ec<br />+593 99 729 4120</p>
           </div>
         </div>
-
       </div>
-
     </section>
   );
 };

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import './board-admin.css'; // Importamos el CSS del admin porque comparte los estilos de la estructura db-
 import './board-cliente.css'; 
+import datos from '../data/productos.json';
+
 
 // Datos simulados de los pagos del cliente (luego vendrán de tu backend Java)
 const PAGOS_EJEMPLO = [
@@ -33,7 +35,7 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
   const [comprobante, setComprobante] = useState(null);
   const [seccion, setSeccion] = useState('pagos'); // 'pagos', 'carga', 'carrito'
 
-  const pagos = PAGOS_EJEMPLO;
+  const pagos = datos.pagos;
 
   const filtrados = pagos.filter(p =>
     p.banco.toLowerCase().includes(filtro.toLowerCase()) ||
