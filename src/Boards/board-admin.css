@@ -188,6 +188,16 @@
   color: #333;
 }
  
+.db-alert {
+  margin: 18px 40px 0;
+  padding: 12px 14px;
+  border: 1px solid #e05c2a;
+  color: #e05c2a;
+  background: rgba(224, 92, 42, 0.08);
+  font-size: 11px;
+  line-height: 1.5;
+}
+ 
 /* ================================================
    ESTADÍSTICAS
    ================================================ */
@@ -352,6 +362,22 @@
 }
  
 /* ================================================
+   REPORTES
+   ================================================ */
+.db-report-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.db-report-card {
+  border: 1px solid #1e1e1e;
+  background: #111;
+  padding: 22px;
+}
+ 
+/* ================================================
    PANEL DE DETALLE
    ================================================ */
 .db-detail {
@@ -442,6 +468,8 @@
   background: #fff;
   color: #111;
   border: none;
+  text-align: center;
+  text-decoration: none;
   font-family: 'DM Mono', monospace;
   font-size: 11px;
   letter-spacing: 0.12em;
@@ -480,7 +508,8 @@
     min-height: 100vh;
   }
 
-  .db-stats {
+  .db-stats,
+  .db-report-grid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -501,6 +530,10 @@
   .db-search {
     width: 100%;
   }
+
+  .db-alert {
+    margin: 14px 20px 0;
+  }
 }
 
 @media (max-width: 560px) {
@@ -512,7 +545,8 @@
     font-size: 24px;
   }
 
-  .db-stats {
+  .db-stats,
+  .db-report-grid {
     grid-template-columns: 1fr;
   }
 
