@@ -9,6 +9,14 @@ const ESTADO_COLOR = {
   rechazado:   { label: "Rechazado",   color: "#e05c2a" },
 };
 
+const leerArchivoComoDataUrl = (archivo) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('No se pudo leer la imagen seleccionada.'));
+    reader.readAsDataURL(archivo);
+  });
+
 const BoardCliente = ({ carrito, setVista,  }) => {
   const [filtro, setFiltro]           = useState('');
   const [comprobante, setComprobante] = useState(null);       // File object
@@ -17,25 +25,33 @@ const BoardCliente = ({ carrito, setVista,  }) => {
   const [pagos, setPagos]             = useState([]);
   const [cargando, setCargando]       = useState(true);
   const [enviando, setEnviando]       = useState(false);
+  const [error, setError]             = useState('');
+  const [imagenModal, setImagenModal] = useState(null);
 
-  // ── Cargar pagos desde Supabase ──────────────────────────────────────────
   useEffect(() => {
     const cargar = async () => {
       setCargando(true);
-      const data = await getPagos();
-      setPagos(data);
-      setCargando(false);
+      setError('');
+
+      try {
+        const data = await getPagos();
+        setPagos(data);
+      } catch (err) {
+        console.error('Error cargando pagos:', err);
+        setError(`No se pudieron cargar pagos: ${err.message}`);
+      } finally {
+        setCargando(false);
+      }
     };
+
     cargar();
   }, []);
 
-  // ── Filtrar pagos ────────────────────────────────────────────────────────
   const filtrados = pagos.filter(p =>
     p.banco?.toLowerCase().includes(filtro.toLowerCase()) ||
     p.estado?.toLowerCase().includes(filtro.toLowerCase())
   );
 
-  // ── Manejar selección de archivo ─────────────────────────────────────────
   const manejarArchivo = (e) => {
     const archivo = e.target.files[0];
     if (!archivo) return;
@@ -48,7 +64,6 @@ const BoardCliente = ({ carrito, setVista,  }) => {
     reader.readAsDataURL(archivo);
   };
 
-  // ── Enviar formulario de comprobante ─────────────────────────────────────
   const enviarFormulario = async (e) => {
     e.preventDefault();
 
@@ -58,45 +73,51 @@ const BoardCliente = ({ carrito, setVista,  }) => {
     }
 
     setEnviando(true);
+    setError('');
     
     try {
-      // Convertir imagen a Base64 para guardarla en Supabase
-      const reader = new FileReader();
-      
-      reader.onloadend = async () => {
-        const base64 = reader.result; // "data:image/jpeg;base64,..."
+      const formulario = e.currentTarget;
+      const formData = new FormData(formulario);
+      const base64 = await leerArchivoComoDataUrl(comprobante);
 
-        await guardarPago({
-          id_orden: e.target[0].value,
-          banco:    e.target[1].value,
-          archivo:  comprobante.name,
-          imagen:   base64,           // Guardamos la imagen en base64
-          estado:   'verificando',
-          fecha:    new Date().toLocaleString(),
-        });
+      await guardarPago({
+        id_orden: formData.get('id_orden'),
+        banco:    formData.get('banco'),
+        monto:    Number(formData.get('monto')),
+        archivo:  comprobante.name,
+        imagen:   base64,
+        estado:   'verificando',
+        fecha:    new Date().toLocaleString(),
+      });
 
-        // Recargar la lista de pagos
-        const data = await getPagos();
-        setPagos(data);
+      const data = await getPagos();
+      setPagos(data);
 
-        alert('✅ Comprobante enviado con éxito. Estará en revisión pronto.');
-        setComprobante(null);
-        setPreview(null);
-        setSeccion('pagos');
-        setEnviando(false);
-      };
-      
-      reader.readAsDataURL(comprobante);
+      alert('Comprobante enviado con éxito. Estará en revisión pronto.');
+      formulario.reset();
+      setComprobante(null);
+      setPreview(null);
+      setSeccion('pagos');
       
     } catch (err) {
       console.error('Error al enviar comprobante:', err);
-      alert('❌ Error al enviar. Intenta de nuevo.');
+      setError(`Error al enviar el comprobante: ${err.message}`);
+      alert('Error al enviar. Intenta de nuevo.');
+    } finally {
       setEnviando(false);
     }
   };
 
   return (
     <div className="db-root">
+      {imagenModal && (
+        <div className="image-modal" onClick={() => setImagenModal(null)}>
+          <div className="image-modal-content" onClick={e => e.stopPropagation()}>
+            <button className="image-modal-close" onClick={() => setImagenModal(null)}>X</button>
+            <img src={imagenModal} alt="Comprobante" />
+          </div>
+        </div>
+      )}
 
       {/* ── SIDEBAR ── */}
       <aside className="db-sidebar">
@@ -152,7 +173,7 @@ const BoardCliente = ({ carrito, setVista,  }) => {
               <div>
                 <h1 className="db-title">Mis Transferencias y Depósitos</h1>
                 <p className="db-subtitle">
-                  {cargando ? 'Cargando...' : `${filtrados.length} registro(s) encontrado(s)`}
+                  {error || (cargando ? 'Cargando...' : `${filtrados.length} registro(s) encontrado(s)`)}
                 </p>
               </div>
               <input
@@ -186,22 +207,19 @@ const BoardCliente = ({ carrito, setVista,  }) => {
                         <td className="db-email" style={{ fontWeight: 'bold' }}>{p.monto}</td>
                         <td className="db-fecha">{p.fecha}</td>
                         <td>
-                          {/* Muestra la imagen si existe */}
                           {p.imagen ? (
-                            <img
-                              src={p.imagen}
-                              alt="Comprobante"
-                              style={{
-                                width: 56,
-                                height: 56,
-                                objectFit: 'cover',
-                                borderRadius: 4,
-                                border: '1px solid #2a2a2a',
-                                cursor: 'pointer',
-                              }}
-                              onClick={() => window.open(p.imagen, '_blank')}
-                              title="Ver imagen completa"
-                            />
+                            <div className="receipt-cell">
+                              <img
+                                src={p.imagen}
+                                alt="Comprobante"
+                                className="receipt-thumb"
+                                onClick={() => setImagenModal(p.imagen)}
+                                title="Ver imagen completa"
+                              />
+                              <button className="db-ver" onClick={() => setImagenModal(p.imagen)}>
+                                Ver
+                              </button>
+                            </div>
                           ) : (
                             <span style={{ color: '#444', fontSize: 11 }}>Sin imagen</span>
                           )}
@@ -276,12 +294,12 @@ const BoardCliente = ({ carrito, setVista,  }) => {
 
                 <div className="upload-field">
                   <label>Número de Orden / Pedido</label>
-                  <input type="number" placeholder="Ej. 102" required />
+                  <input name="id_orden" type="number" placeholder="Ej. 102" required />
                 </div>
 
                 <div className="upload-field">
                   <label>Banco de Destino</label>
-                  <select required>
+                  <select name="banco" required>
                     <option value="">Selecciona el banco...</option>
                     <option value="pichincha">Banco Pichincha</option>
                     <option value="guayaquil">Banco Guayaquil</option>
@@ -289,7 +307,11 @@ const BoardCliente = ({ carrito, setVista,  }) => {
                   </select>
                 </div>
 
-                {/* Dropzone */}
+                <div className="upload-field">
+                  <label>Monto transferido</label>
+                  <input name="monto" type="number" min="0" step="0.01" placeholder="Ej. 25.50" required />
+                </div>
+
                 <div className="dropzone">
                   <span className="dropzone-icon">📷</span>
                   <label htmlFor="file-upload" className="custom-file-upload">
@@ -306,7 +328,6 @@ const BoardCliente = ({ carrito, setVista,  }) => {
                   />
                 </div>
 
-                {/* Preview de la imagen seleccionada */}
                 {preview && (
                   <div style={{ textAlign: 'center' }}>
                     <p style={{ fontSize: 11, color: '#666', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
@@ -333,6 +354,8 @@ const BoardCliente = ({ carrito, setVista,  }) => {
                 >
                   {enviando ? 'Enviando...' : 'Enviar Comprobante'}
                 </button>
+
+                {error && <p className="db-empty" style={{ padding: 0 }}>{error}</p>}
               </form>
             </div>
           </>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import StorePublic from './pages/PublicStore';
 import UserStore from './pages/UserStore';
 import LoginAdmin from './components/login_admin';

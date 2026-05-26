@@ -8,6 +8,7 @@ const Formulario = () => {
     motivo: '', mensaje: '', newsletter: false
   });
   const [enviado, setEnviado] = useState(false);
+  const [error, setError] = useState('');
  
   const manejarCambio = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,19 +25,10 @@ const Formulario = () => {
   const manejarEnvio = async (e) => {
     e.preventDefault();
     if (!formularioValido) return;
- 
-    // Guardar en Supabase
-    await guardarConsulta({
-      nombre:   form.nombre,
-      apellido: form.apellido,
-      email:    form.email,
-      motivo:   form.motivo,
-      mensaje:  form.mensaje,
-    });
- 
-    // También guardar en localStorage para que aparezca en el dashboard local
-    const consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
-    consultas.push({
+
+    setError('');
+
+    const nuevaConsulta = {
       id:       Date.now(),
       nombre:   form.nombre,
       apellido: form.apellido,
@@ -44,9 +36,19 @@ const Formulario = () => {
       motivo:   form.motivo,
       mensaje:  form.mensaje,
       fecha:    new Date().toLocaleString(),
-    });
+    };
+
+    try {
+      await guardarConsulta(nuevaConsulta);
+    } catch (err) {
+      console.error('Error guardando consulta en Supabase:', err);
+      setError('No se pudo guardar en Supabase, pero se guardó localmente para revisión.');
+    }
+
+    const consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
+    consultas.push(nuevaConsulta);
     localStorage.setItem('consultas', JSON.stringify(consultas));
- 
+
     setEnviado(true);
     setForm({
       nombre: '', apellido: '', email: '',
@@ -149,6 +151,12 @@ const Formulario = () => {
           {enviado && (
             <div className="contacto-exito">
               ✓ Mensaje recibido — te respondemos en menos de 24 horas
+            </div>
+          )}
+
+          {error && (
+            <div className="contacto-exito" style={{ color: '#c49a00' }}>
+              {error}
             </div>
           )}
         </form>

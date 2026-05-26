@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getConsultas, supabaseConfigurado } from '../api.js';
-import { getPagos } from '../api.js';
+import { getConsultas, getPagos, supabaseConfigurado } from '../api.js';
 import './board-admin.css';
 
 const MOTIVO_COLOR = {
@@ -70,8 +69,8 @@ const PanelClientes = ({ consultas }) => {
   });
   const clientes = Object.values(clientesMap);
   const filtrados = clientes.filter(cl =>
-    cl.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
-    cl.email.toLowerCase().includes(filtro.toLowerCase())
+    cl.nombre?.toLowerCase().includes(filtro.toLowerCase()) ||
+    cl.email?.toLowerCase().includes(filtro.toLowerCase())
   );
 
   return (
@@ -194,20 +193,13 @@ const BarChart = ({ data }) => {
   );
 };
 
-const PanelReportes = ({ consultas, pagos }) => {
+const PanelReportes = ({ consultas, pagos, onVerImagen }) => {
   const total = consultas.length;
   const porMotivo = Object.entries(MOTIVO_COLOR).map(([key, val]) => ({
     label: val.label, value: consultas.filter(c => c.motivo === key).length, color: val.color,
   })).filter(item => item.value > 0);
-  const fechasUnicas = [...new Set(consultas.map(c => (c.fecha || '').split(' ')[0]))].filter(Boolean).sort();
-  const porFecha = fechasUnicas.slice(-7).map(fecha => ({
-    label: fecha.slice(5),
-    value: consultas.filter(c => (c.fecha || '').startsWith(fecha)).length,
-    color: '#1a6aff',
-  }));
   const emailsUnicos = new Set(consultas.map(c => c.email)).size;
   const devoluciones = consultas.filter(c => c.motivo === 'devolucion').length;
-  const tasaDevolucion = total > 0 ? ((devoluciones / total) * 100).toFixed(1) : 0;
   const pagosVerificando = pagos.filter(p => p.estado === 'verificando').length;
 
   return (
@@ -251,10 +243,10 @@ const PanelReportes = ({ consultas, pagos }) => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <img src={p.imagen} alt="comprobante"
                         style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 4, border: '1px solid #2a2a2a', cursor: 'pointer' }}
-                        onClick={() => window.open(p.imagen, '_blank')}
+                        onClick={() => onVerImagen(p.imagen)}
                       />
                       <button
-                        onClick={() => window.open(p.imagen, '_blank')}
+                        onClick={() => onVerImagen(p.imagen)}
                         style={{ background: '#1a1a1a', border: '1px solid #333', color: '#aaa', fontSize: 10, padding: '4px 10px', borderRadius: 3, cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}
                       >
                         Ver
@@ -307,44 +299,44 @@ const Dashboard = () => {
   const [cargando, setCargando]     = useState(true);
   const [fuenteDatos, setFuenteDatos] = useState('local');
   const [imagenModal, setImagenModal] = useState(null); // URL de imagen a mostrar en modal
+  const [error, setError]           = useState('');
 
   const cargarDatos = useCallback(async () => {
-    // Cargar consultas
+    setError('');
+    const delFormulario = JSON.parse(localStorage.getItem('consultas') || '[]');
+
     if (supabaseConfigurado) {
       try {
         const datos_sb = await getConsultas();
-        if (datos_sb && datos_sb.length >= 0) {
-          const delFormulario = JSON.parse(localStorage.getItem('consultas') || '[]');
-          const emailsMensajes = new Set(datos_sb.map(c => `${c.email}|${c.mensaje}`));
-          const soloLocales = delFormulario.filter(c => !emailsMensajes.has(`${c.email}|${c.mensaje}`));
-          setConsultas([...datos_sb, ...soloLocales]);
-          setFuenteDatos('supabase');
-        }
+        const emailsMensajes = new Set(datos_sb.map(c => `${c.email}|${c.mensaje}`));
+        const soloLocales = delFormulario.filter(c => !emailsMensajes.has(`${c.email}|${c.mensaje}`));
+        setConsultas([...datos_sb, ...soloLocales]);
+        setFuenteDatos('supabase');
       } catch (err) {
         console.warn('Supabase no disponible:', err.message);
-        const delFormulario = JSON.parse(localStorage.getItem('consultas') || '[]');
-        setConsultas([...datos.consultas, ...delFormulario]);
+        setConsultas(delFormulario);
         setFuenteDatos('local');
+        setError(`No se pudieron cargar consultas desde Supabase: ${err.message}`);
       }
     } else {
-      const delFormulario = JSON.parse(localStorage.getItem('consultas') || '[]');
-      setConsultas([...datos.consultas, ...delFormulario]);
+      setConsultas(delFormulario);
       setFuenteDatos('local');
+      setError('Supabase no esta configurado. Revisa las variables VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.');
     }
 
-    // Cargar pagos desde Supabase
     try {
       const pagosData = await getPagos();
       setPagos(pagosData);
     } catch (err) {
       console.warn('Error cargando pagos:', err.message);
+      setPagos([]);
+      setError(prev => prev || `No se pudieron cargar pagos desde Supabase: ${err.message}`);
     }
 
     setCargando(false);
   }, []);
 
   useEffect(() => {
-    // FIX: llamar cargarDatos dentro de una función async en useEffect
     const iniciar = async () => {
       await cargarDatos();
     };
@@ -413,7 +405,7 @@ const Dashboard = () => {
                 <header className="db-header">
                   <div>
                     <h1 className="db-title">Consultas recibidas</h1>
-                    <p className="db-subtitle">{filtradas.length} resultado(s)</p>
+                    <p className="db-subtitle">{error || `${filtradas.length} resultado(s)`}</p>
                   </div>
                   <input className="db-search" placeholder="Buscar por nombre, email o motivo..."
                     value={filtro} onChange={e => setFiltro(e.target.value)} />
@@ -453,7 +445,7 @@ const Dashboard = () => {
             )}
 
             {seccion === 'clientes' && <PanelClientes consultas={consultas} />}
-            {seccion === 'reportes' && <PanelReportes consultas={consultas} pagos={pagos} />}
+            {seccion === 'reportes' && <PanelReportes consultas={consultas} pagos={pagos} onVerImagen={setImagenModal} />}
           </>
         )}
       </main>

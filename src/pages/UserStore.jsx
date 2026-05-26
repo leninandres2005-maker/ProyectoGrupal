@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import MenuBarUser from '../components/MenuBarUser.jsx';
 import Inicio from '../components/inicio.jsx';
 
