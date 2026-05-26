@@ -1,0 +1,124 @@
+/* /workspaces/ProyectoGrupal/src/Boards/board-cliente.css */
+
+.upload-container {
+  padding: 40px;
+  max-width: 600px;
+  margin: 40px auto;
+  background: #111; /* Darker background for the form area */
+  border: 1px solid #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.upload-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-field label {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.upload-field input[type="number"],
+.upload-field select {
+  background: #0d0d0d;
+  border: 1px solid #242424;
+  color: #c2c0b6;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.upload-field input[type="number"]:focus,
+.upload-field select:focus {
+  border-color: #444;
+  box-shadow: 0 0 0 2px rgba(68, 68, 68, 0.2);
+}
+
+.upload-field select option {
+  background: #111;
+  color: #c2c0b6;
+}
+
+.dropzone {
+  border: 2px dashed #333;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  background: #1a1a1a;
+}
+
+.dropzone:hover {
+  border-color: #555;
+  background-color: #222;
+}
+
+.dropzone-icon {
+  font-size: 48px;
+  color: #555;
+}
+
+.custom-file-upload {
+  display: inline-block;
+  background: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 14px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+.custom-file-upload:hover {
+  background: #444;
+}
+
+.dropzone input[type="file"] {
+  display: none; /* Hide the default file input */
+}
+
+.btn-enviar-pago {
+  background: #1a6aff; /* A primary action color */
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  margin-top: 10px;
+}
+
+.btn-enviar-pago:hover:not(:disabled) {
+  background: #0f5ae0;
+}
+
+.btn-enviar-pago:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

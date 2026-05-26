@@ -1,62 +1,67 @@
 import { useEffect, useState } from 'react';
-import MenuBar from './MenuBar.jsx';
 import ListaProductos from './card_ropa.jsx';
-import UserLogin from './login.jsx';
-import BoardCliente from '../Boards/board_cliente.jsx';
+import Formulario from './Formulario.jsx';
 import './inicio.css';
+import PieDePagina from './PieDePagina.jsx';
 
-function Inicio() {
-  const [imagenPortada, setImagenPortada] = useState('');
-  const [categoria, setCategoria] = useState('minimalist-clothing');
-  const [mostrarLogin, setMostrarLogin] = useState(false);
-  const [usuario, setUsuario] = useState(false);
+function Inicio({ categoria, agregarAlCarrito }) {
+  const [imagenes, setImagenes] = useState([]);
+  const [indiceActual, setIndiceActual] = useState(0);
 
   useEffect(() => {
-
-    // Llamamos a Unsplash buscando una imagen 
     const query = 'fashion-clothing';
     const accessKey = 'aVi9cRhtwFFKb55altpMyhGqH71RMBYq8vYBj-yNlps';
 
-
-    fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${accessKey}`)
+    // Pedimos 5 imágenes a la vez
+    fetch(`https://api.unsplash.com/photos/random?query=${query}&count=5&client_id=${accessKey}`)
       .then(response => response.json())
       .then(data => {
-        setImagenPortada(data.urls.regular);
+        setImagenes(data.map(img => img.urls.regular));
       })
-      .catch(error => console.error("Error al traer la imagen de Unsplash:", error));
-
+      .catch(error => console.error("Error al traer las imágenes de Unsplash:", error));
   }, []);
 
-  if (usuario) {
-    return <BoardCliente />;
-  }
+  const siguienteImagen = () => {
+    setIndiceActual((prev) => (prev === imagenes.length - 1 ? 0 : prev + 1));
+  };
+
+  const anteriorImagen = () => {
+    setIndiceActual((prev) => (prev === 0 ? imagenes.length - 1 : prev - 1));
+  };
 
   return (
-    <div className="App">
-
-      <MenuBar setCategoria={setCategoria} />
-
-      {mostrarLogin && (
-        <div className="modal-overlay" onClick={() => setMostrarLogin(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <UserLogin onLoginSuccess={() => {
-              setUsuario(true);
-              setMostrarLogin(false);
-            }} />
-          </div>
-        </div>
-      )}
-
+    <div>
       <div
         className="hero-section"
-        style={{ backgroundImage: `url(${imagenPortada})` }}
+        style={{ backgroundImage: `url(${imagenes[indiceActual] || ''})` }}
       >
+        {imagenes.length > 0 && (
+          <>
+            <button className="carousel-control prev" onClick={anteriorImagen}>❮</button>
+            <button className="carousel-control next" onClick={siguienteImagen}>❯</button>
+            
+            <div className="carousel-indicators">
+              {imagenes.map((_, index) => (
+                <span 
+                  key={index} 
+                  className={`dot ${index === indiceActual ? 'active' : ''}`}
+                  onClick={() => setIndiceActual(index)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
         <div className="hero-overlay">
-            <button onClick={() => setMostrarLogin(true)} className="btn-comprar">Iniciar sesión</button>
+          <h1>Jenna</h1>
+          <p style={{ letterSpacing: '4px', fontSize: '1.2rem', marginTop: '10px' }}>NUEVA COLECCIÓN 2026</p>
         </div>
       </div>
 
-      <ListaProductos categoria={categoria} />
+      <ListaProductos categoria={categoria} agregarAlCarrito={agregarAlCarrito} />
+      <Formulario />
+      <PieDePagina />
+
     </div>
   );
 }

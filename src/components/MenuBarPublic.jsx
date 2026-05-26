@@ -1,4 +1,4 @@
-
+import { useState, useEffect } from 'react';
 import '../App.css';
 import './inicio.css';
 
@@ -163,7 +163,20 @@ const menuItems = [
     products: ["Men Sale", "Women Sale", "Kids Sale", "All Sale"],
   },
 ];
-const MenuBar = ({ setCategoria }) => {
+const MenuBar = ({ setCategoria, usuario, setVista }) => {
+  const [shoeImages, setShoeImages] = useState([]);
+
+  useEffect(() => {
+    const accessKey = 'aVi9cRhtwFFKb55altpMyhGqH71RMBYq8vYBj-yNlps';
+    // Traemos 20 imágenes de calzado para distribuir en el menú
+    fetch(`https://api.unsplash.com/search/photos?query=sneakers&per_page=20&client_id=${accessKey}`)
+      .then(res => res.json())
+      .then(data => {
+        setShoeImages(data.results.map(img => img.urls.thumb));
+      })
+      .catch(err => console.error("Error al cargar imágenes del menú:", err));
+  }, []);
+
   return (
     <header className="navbar">
 
@@ -174,7 +187,7 @@ const MenuBar = ({ setCategoria }) => {
         </div>
 
         <nav className="nav-menu">
-          {menuItems.map((menu) => (
+          {menuItems.map((menu, mIndex) => (
             <div className="nav-item" key={menu.name}>
               <span onClick={() => setCategoria(menu.query
               )}>
@@ -199,16 +212,24 @@ const MenuBar = ({ setCategoria }) => {
                 <div className="mega-products">
                   <div className="products-header">
                     <h3>Shoes</h3>
-                    <span>View all</span>
+                    <span onClick={() => setCategoria('shoes')}>View all</span>
                   </div>
 
                   <div className="product-list">
-                    {menu.products.map((product) => (
-                      <div className="product-card" key={product}>
-                        <div className="product-img">👟</div>
-                        <p>{product}</p>
-                      </div>
-                    ))}
+                    {menu.products.map((product, pIndex) => {
+                      // Calculamos un índice para que cada producto tenga una imagen distinta
+                      const imgIndex = (mIndex * 4 + pIndex) % shoeImages.length;
+                      return (
+                        <div className="product-card" key={product} onClick={() => setCategoria(product)}>
+                          <div className="product-img">
+                            {shoeImages.length > 0 ? (
+                              <img src={shoeImages[imgIndex]} alt={product} />
+                            ) : "👟"}
+                          </div>
+                          <p>{product}</p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -217,17 +238,14 @@ const MenuBar = ({ setCategoria }) => {
         </nav>
 
         <div className="nav-actions">
-          <div className="search-box">
-            <span>🔍</span>
-            <input type="text" placeholder="Search" />
-          </div>
-
-          <span className="icon">♥</span>
-          <span className="icon">🛒</span>
-          <a className="login-nav-button" href="/login" target="_blank" rel="noreferrer">
-            Administrador
-          </a>
-          
+          {usuario ? (
+            <div className="user-profile-nav" onClick={() => setVista('login')}>
+              <span className="user-avatar-mini">U</span>
+              <span className="user-name-nav">Iniciar sesión</span>
+            </div>
+          ) : (
+            <span className="icon" onClick={() => setVista('login')} style={{ cursor: 'pointer' }}>👤</span>
+          )}
         </div>
       </div>
     </header>

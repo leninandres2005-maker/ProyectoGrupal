@@ -1,7 +1,7 @@
 /* ===== SECCIÓN CONTACTO ===== */
 .contacto-section {
   background: #111;
-  font-family: 'Georgia', serif;
+  font-family: 'DM Mono', monospace;
 }
 
 .contacto-header {
@@ -11,7 +11,8 @@
 }
 
 .contacto-titulo {
-  font-size: 36px;
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
   font-weight: 400;
   color: #fff;
   letter-spacing: -0.02em;
@@ -188,7 +189,8 @@
 }
 
 .footer-marca {
-  font-size: 20px;
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
   font-weight: 400;
   color: #fff;
   margin: 0 0 12px;

@@ -6,7 +6,6 @@ import './board-admin.css';
 // cuando tengas el backend listo
 // ============================================================
 
-//genesis, esto es hecho por ia, no entendi ni pija, leelo, no sea loca :D
 const CONSULTAS_EJEMPLO = [
   {
     id: 1,           // <- aquí irá rs.getInt("id")

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './login-admin.css';
 
-const Login = ({ onLogin }) => {
+const LoginAdmin = ({ onLogin }) => {
   const [form, setForm] = useState({ usuario: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -97,4 +97,4 @@ const Login = ({ onLogin }) => {
   );
 };
 
-export default Login;
+export default LoginAdmin;

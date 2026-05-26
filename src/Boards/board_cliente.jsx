@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './board-admin.css'; // Importamos el CSS del admin porque comparte los estilos de la estructura db-
 import './board-cliente.css'; 
 
 // Datos simulados de los pagos del cliente (luego vendrán de tu backend Java)
@@ -27,10 +28,10 @@ const ESTADO_COLOR = {
   rechazado:  { label: "Rechazado", color: "#e05c2a" },
 };
 
-const BoardCliente = () => {
+const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
   const [filtro, setFiltro] = useState('');
   const [comprobante, setComprobante] = useState(null);
-  const [vistaCarga, setVistaCarga] = useState(false); 
+  const [seccion, setSeccion] = useState('pagos'); // 'pagos', 'carga', 'carrito'
 
   const pagos = PAGOS_EJEMPLO;
 
@@ -52,7 +53,7 @@ const BoardCliente = () => {
     e.preventDefault();
     alert(`¡Comprobante ${comprobante?.name} enviado con éxito para revisión!`);
     setComprobante(null);
-    setVistaCarga(false);
+    setSeccion('pagos');
   };
 
   return (
@@ -67,26 +68,36 @@ const BoardCliente = () => {
 
         <nav className="db-nav">
           <button 
-            className={`db-nav-item ${!vistaCarga ? 'active' : ''}`} 
-            onClick={() => setVistaCarga(false)}
+            className={`db-nav-item ${seccion === 'pagos' ? 'active' : ''}`} 
+            onClick={() => setSeccion('pagos')}
           >
             <span className="db-nav-icon">📊</span>
             Mis Pagos
           </button>
           <button 
-            className={`db-nav-item ${vistaCarga ? 'active' : ''}`} 
-            onClick={() => setVistaCarga(true)}
+            className={`db-nav-item ${seccion === 'carrito' ? 'active' : ''}`} 
+            onClick={() => setSeccion('carrito')}
+          >
+            <span className="db-nav-icon">🛒</span>
+            Mi Carrito ({carrito.length})
+          </button>
+          <button 
+            className={`db-nav-item ${seccion === 'carga' ? 'active' : ''}`} 
+            onClick={() => setSeccion('carga')}
           >
             <span className="db-nav-icon">📤</span>
             Subir Depósito
           </button>
         </nav>
 
-        <div className="db-sidebar-footer">
+        <div className="db-sidebar-footer" onClick={() => {
+          setVista('tienda');
+          // Opcional: setUsuario(false) si quieres que cierre sesión
+        }} style={{cursor: 'pointer'}}>
           <div className="db-avatar">U</div>
           <div>
-            <p className="db-avatar-name">Mi Perfil</p>
-            <p className="db-avatar-role">Cliente Premium</p>
+            <p className="db-avatar-name">Volver a Tienda</p>
+            <p className="db-avatar-role">Seguir Comprando</p>
           </div>
         </div>
       </aside>
@@ -95,7 +106,7 @@ const BoardCliente = () => {
       <main className="db-main">
         
         {/* Renderizado Condicional: O ve sus pagos, o sube un comprobante */}
-        {!vistaCarga ? (
+        {seccion === 'pagos' && (
           <>
             {/* Cabecera Historial */}
             <header className="db-header">
@@ -144,7 +155,38 @@ const BoardCliente = () => {
               </table>
             </div>
           </>
-        ) : (
+        )}
+
+        {seccion === 'carrito' && (
+          <div className="db-table-wrap">
+            <header className="db-header">
+              <h1 className="db-title">Productos en el Carrito</h1>
+            </header>
+            <table className="db-table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unit.</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {carrito.map((item, index) => (
+                  <tr key={index}>
+                    <td className="db-nombre">{item.nombre}</td>
+                    <td>{item.cantidad}</td>
+                    <td>${item.precio}</td>
+                    <td style={{color: 'white'}}>${item.precio * item.cantidad}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {carrito.length === 0 && <p className="db-empty">Tu carrito está vacío.</p>}
+          </div>
+        )}
+
+        {seccion === 'carga' && (
           <>
             {/* Formulario de Carga Estilizado */}
             <header className="db-header">

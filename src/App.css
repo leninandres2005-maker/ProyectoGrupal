@@ -1,11 +1,14 @@
+
 .navbar {
   width: 100%;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 999;
-  background-color: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
+  transition: all 0.3s ease;
+  font-family: 'DM Mono', monospace;
 }
 
 .top-links {
@@ -31,6 +34,7 @@
   align-items: center;
   gap: 8px;
   font-weight: bold;
+  font-family: 'Playfair Display', serif;
   flex-shrink: 0;
 }
 
@@ -44,6 +48,7 @@
   align-items: center;
   gap: 28px;
   height: 100%;
+  font-family: 'DM Mono', monospace;
   min-width: 0;
 }
 
@@ -54,6 +59,7 @@
   font-size: 14px;
   cursor: pointer;
   position: relative;
+  transition: color 0.3s ease;
 }
 
 .nav-item.active {
@@ -79,12 +85,14 @@
 }
 
 .search-box {
-  background-color: rgba(255, 255, 255, 0.7);
-  padding: 10px 14px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  border-radius: 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background 0.3s;
 }
 
 .search-box input {
@@ -92,6 +100,7 @@
   outline: none;
   background: transparent;
   width: 120px;
+  color: white;
 }
 
 .icon {
@@ -126,16 +135,22 @@
 .mega-menu {
   position: absolute;
   top: 70px;
+  top: 100%; /* Se pega exactamente al borde inferior para que no se cierre */
   left: 50%;
   transform: translateX(-50%);
   width: 600px;
-  background-color: transparent;
+  width: 90vw; /* Fondo más grande */
+  max-width: 1000px;
+  /* El menú desplegable necesita fondo para ser legible */
+  background-color: rgba(13, 13, 13, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: none;
   grid-template-columns: 1fr 1fr 1fr 2fr;
   gap: 35px;
   padding: 30px 35px;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-  color: #111;
+  color: white;
 }
 
 
@@ -150,6 +165,8 @@
 .products-header h3 {
   margin: 0 0 18px;
   font-size: 18px;
+  font-size: 16px;
+  font-family: 'Playfair Display', serif;
   color: white;
 }
 
@@ -162,12 +179,13 @@
 .mega-column p {
   margin: 14px 0;
   font-size: 14px;
-  color: white;
+  color: #aaa;
   cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .mega-column p:hover {
-  color: #c40018;
+  color: white;
 }
 
 .products-header {
@@ -199,6 +217,13 @@
   justify-content: center;
   font-size: 32px;
   margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.mega-menu .product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .mega-menu .product-card p {
@@ -227,6 +252,8 @@
 
 .hero h1 {
   font-size: 52px;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 8vw, 4rem);
   line-height: 1;
   margin: 0 0 20px;
 }
@@ -234,6 +261,7 @@
 .hero p {
   max-width: 600px;
   font-size: 16px;
+  font-family: 'DM Mono', monospace;
 }
 
 @media (max-width: 980px) {
