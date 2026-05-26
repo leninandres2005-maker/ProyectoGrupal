@@ -9,7 +9,7 @@ const ESTADO_COLOR = {
   rechazado:   { label: "Rechazado",   color: "#e05c2a" },
 };
 
-const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
+const BoardCliente = ({ carrito, setVista,  }) => {
   const [filtro, setFiltro]           = useState('');
   const [comprobante, setComprobante] = useState(null);       // File object
   const [preview, setPreview]         = useState(null);       // Base64 URL para previsualizar
@@ -49,28 +49,20 @@ const BoardCliente = ({ carrito, setUsuario, setVista, cliente }) => {
   };
 
   // ── Enviar formulario de comprobante ─────────────────────────────────────
-const enviarFormulario = async (e) => {
-  e.preventDefault();
+  const enviarFormulario = async (e) => {
+    e.preventDefault();
 
-  await guardarPago({
-    id_orden: e.target[0].value,
-    banco: e.target[1].value,
-    estado: 'verificando',
-    archivo: comprobante?.name || ''
-  });
-
-  alert('Comprobante enviado');
-  setComprobante(null);
-  setSeccion('pagos');
-
-  const data = await getPagos();
-  setPagos(data);
-};
+    if (!comprobante) {
+      alert('Por favor, selecciona un comprobante');
+      return;
+    }
 
     setEnviando(true);
+    
     try {
       // Convertir imagen a Base64 para guardarla en Supabase
       const reader = new FileReader();
+      
       reader.onloadend = async () => {
         const base64 = reader.result; // "data:image/jpeg;base64,..."
 
@@ -93,7 +85,9 @@ const enviarFormulario = async (e) => {
         setSeccion('pagos');
         setEnviando(false);
       };
+      
       reader.readAsDataURL(comprobante);
+      
     } catch (err) {
       console.error('Error al enviar comprobante:', err);
       alert('❌ Error al enviar. Intenta de nuevo.');
@@ -101,7 +95,7 @@ const enviarFormulario = async (e) => {
     }
   };
 
-  return(
+  return (
     <div className="db-root">
 
       {/* ── SIDEBAR ── */}
@@ -346,6 +340,6 @@ const enviarFormulario = async (e) => {
       </main>
     </div>
   );
-
+};
 
 export default BoardCliente;

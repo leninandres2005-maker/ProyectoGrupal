@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import datos from '../data/productos.json';
 import { getConsultas, supabaseConfigurado } from '../api.js';
 import { getPagos } from '../api.js';
 import './board-admin.css';
