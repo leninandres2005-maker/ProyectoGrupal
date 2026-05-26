@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = 'https://kcnecctcovbwgramjjjj.supabase.co';
 
-export const supabaseConfigurado = Boolean(supabaseUrl && supabaseAnonKey);
+
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjbmVjY3Rjb3Zid2dyYW1qaWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NjY5ODcsImV4cCI6MjA5NTM0Mjk4N30.jq8-2R61rP8-Ov58ng190xhPGOzfuWgpEPOZ8GdTqeo';
+
+export const supabaseConfigurado = true;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -14,7 +16,7 @@ export const getConsultas = async () => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error consultando consultas:', error.message);
+    console.error('Error consultando consultas:', error);
     return [];
   }
 
@@ -28,7 +30,7 @@ export const guardarConsulta = async (consulta) => {
     .select();
 
   if (error) {
-    console.error('Error guardando consulta:', error.message);
+    console.error('Error guardando consulta:', error);
     throw error;
   }
 
@@ -42,7 +44,7 @@ export const getPagos = async () => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error consultando pagos:', error.message);
+    console.error('Error consultando pagos:', error);
     return [];
   }
 
@@ -56,7 +58,7 @@ export const guardarPago = async (pago) => {
     .select();
 
   if (error) {
-    console.error('Error guardando pago:', error.message);
+    console.error('Error guardando pago:', error);
     throw error;
   }
 

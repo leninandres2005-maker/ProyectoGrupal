@@ -101,7 +101,7 @@ const enviarFormulario = async (e) => {
     }
   };
 
-  return (
+  return(
     <div className="db-root">
 
       {/* ── SIDEBAR ── */}
@@ -346,6 +346,6 @@ const enviarFormulario = async (e) => {
       </main>
     </div>
   );
-};
+
 
 export default BoardCliente;
